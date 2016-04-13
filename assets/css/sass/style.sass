@@ -1,0 +1,117 @@
+body
+	font-family: Roboto, Arial, sans-serif
+	width: 320px
+
+h1, h2, h3, h4, h5
+	outline: none !important
+	color: #666666
+	margin: 0
+	font-weight: 400
+
+.helper-text
+	color: gray
+	font-size: 0.9em
+	display: block
+	margin: 5px 0
+
+/**
+ * Logo del proveedor
+ */
+.provider-logo
+	text-align: center
+	border-bottom: 1px solid #F2F2F2
+	padding: 10px 0
+
+	img 
+		max-height: 20px
+
+/**
+ * Selección de modo
+ */
+.mode-selector
+	display: none
+
+	& > div > div
+		flex: 1
+		text-align: center
+
+		h1
+			font-size: 1.5em
+			cursor: pointer			
+			padding: 20px 0
+			transition: all .2s ease-in-out
+
+			&:hover
+				color: black
+				background: #F2F2F2
+
+/**
+ * Caja de carga
+ */
+.loading
+	//display: none
+	text-align: center
+
+	h2
+		font-size: 2.5em
+		font-family: Segoe UI, Arial, sans-serif
+		font-weight: 300
+		margin: 20px 0
+
+.session-details
+	display: none
+	
+/**
+ * Caja de información
+ */
+.box
+	//margin-top: 10px
+	padding: 15px
+
+	&.create-box
+		display: none
+
+	&.join-box
+		display: none
+
+	.error-msg
+		display: none
+		padding: 10px
+		color: red
+		font-size: 0.9em
+		text-align: center
+
+	h3
+		margin: 0
+		font-size: 1.3em
+		font-weight: 600
+		margin-bottom: 10px
+
+/**
+ * Grupo de formulario
+ */
+.form-group
+	font-size: 1.1em
+	margin-top: 15px
+
+	label[for]
+		cursor: pointer
+
+	&.btns
+		margin: 20px 0
+		text-align: center
+
+	input:not([type="checkbox"])
+		outline: none !important
+		padding: 8px
+		margin-top: 5px
+		width: 90%
+
+	button
+		text-align: center
+		padding: 8px 15px
+		border: 0
+		background: #FF0A16
+		color: white
+		font-weight: 900
+		cursor: pointer

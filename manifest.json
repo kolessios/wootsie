@@ -1,0 +1,59 @@
+{
+	"manifest_version": 2,
+	"name": "Wootsie",
+	"version": "0.1",
+	"version_name": "beta 1",
+
+	//"default_locale": "es",
+	"description": "Wootsie te permite ver sincronizadamente con tus amigos y familiares tus series y películas favoritas de los servicios de Streaming más populares.",
+
+	"author": "Ivan Bravo Bravo",
+	"homepage_url": "http://sie.woots.mx/",
+
+	"minimum_chrome_version": "49",
+	"offline_enabled": false,
+
+	"icons": {
+		"48": "assets/icon48.png"
+	},
+
+	"page_action": {
+		"default_icon": "assets/icon16.png",
+		"default_popup": "popup.html",
+		"default_title": "Refresca la página para comenzar"
+	},
+
+	"permissions": [
+		"activeTab",
+		"clipboardWrite",
+		"tabs"
+	],
+
+	"background": {
+		"scripts": [
+			"assets/js/providers/base.js", 
+			"assets/js/providers/netflix.js", 
+			"background.js"
+		],
+		"persistent": false
+	},
+
+	"content_scripts": [
+		{
+			"matches": ["https://www.netflix.com/watch/*"],
+     		"css": ["assets/css/client.css"],
+      		"js": [
+      			"assets/js/providers/base.js", 
+				"assets/js/providers/netflix.js",
+
+      			"assets/js/libs/firebase.js",
+      			"assets/js/libs/jquery-2.2.3.min.js", 
+      			"assets/js/libs/jquery.query-object.js",
+      			
+      			"assets/js/streaming.js"
+      		]
+		}
+	],
+
+	"content_security_policy": "script-src 'self' https://ajax.googleapis.com https://cdn.firebase.com https://wootsie.firebaseio.com https://*.firebase.com https://*.firebaseio.com; object-src 'self'"
+}

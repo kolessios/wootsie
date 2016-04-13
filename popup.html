@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Test Popup</title>
+
+	<!-- Estilo -->
+	<link rel="stylesheet" href="assets/css/style.css" />
+
+	<!-- Proveedores -->
+	<script src="assets/js/providers/base.js"></script>
+	<script src="assets/js/providers/netflix.js"></script>
+
+	<!-- JS -->
+	<script src="assets/js/libs/jquery-2.2.3.min.js"></script>
+	<script src="assets/js/libs/jquery.query-object.js"></script>
+
+	<script src="assets/js/popup.js"></script>
+</head>
+<body>
+	<!-- Logo del proveedor -->
+	<div class="provider-logo">
+		<img src="" id="provider-logo" />
+	</div>
+
+	<!-- Modo de sesión -->
+	<div class="mode-selector">
+		<div style="display: flex">
+			<div data-show=".create-box" class="create-session-button">
+				<h1>Crear sesión</h1>
+			</div>
+
+			<div data-show=".join-box" class="join-session-button">
+				<h1>Únirse a sesión</h1>
+			</div>
+		</div>
+	</div>
+
+	<!-- Información de la sesión -->
+	<div class="session-details box">
+		<h3>Detalles de la sesión</h3>
+
+		<div class="form-group">
+			<strong>ID de la sesión:</strong><br />
+			<input data-value="session_id" />
+		</div>
+
+		<div class="form-group">
+			<strong>Dirección:</strong><br />
+			<input data-value="session_url" id="session_url" />
+		</div>
+
+		<p class="helper-text">
+			Tus amigos pueden acceder usando la <strong>ID de la sesión</strong> o accediendo directamente con la <strong>dirección</strong> en Google Chrome (siempre y cuando tengan Wootsie instalado)
+		</p>
+
+		<div class="form-group btns">
+			<button type="button" id="disconnect">Desconectar</button>
+		</div>
+	</div>
+
+	<!-- Crear sesión -->
+	<div class="create-box box">
+		<h3>Creación de sesión</h3>
+
+		<div class="form-group">
+			<input id="name" placeholder="Tu nombre" />
+		</div>
+
+		<div class="form-group">
+			<input type="checkbox" id="control" value="1" /> <label for="control">Autoridad total</label>
+			<span class="helper-text">Solo tú podrás reproducir, pausar y controlar la reproducción.</span>
+		</div>
+
+		<div class="form-group btns">
+			<button type="button" data-back>< Volver</button>
+			<button type="button" id="create-session">¡Comenzar!</button>
+		</div>
+
+		<span class="helper-text">Al comenzar se te asignara una ID y una dirección especial para compartir con tus amigos y familiares.</span>
+	</div>
+
+	<!-- Unirse a sesión -->
+	<div class="join-box box">
+		<h3>Unirse a una sesión</h3>
+
+		<span class="error-msg">¡La sesión no existe! Quizá haya caducado o lo has escrito incorrectamente.</span>
+
+		<div class="form-group">
+			<input id="join-name" placeholder="Tu nombre" />
+		</div>
+
+		<div class="form-group">
+			<input id="id" placeholder="ID de la Sesión" />
+		</div>
+
+		<div class="form-group btns">
+			<button type="button" data-back>< Volver</button>
+			<button type="button" id="join-session">Unirse</button>
+		</div>
+	</div>
+
+	<!-- Cargando -->
+	<div class="loading">
+		<h2>Cargando...</h2>
+	</div>
+</body>
+</html>
