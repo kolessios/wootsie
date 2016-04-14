@@ -46,7 +46,7 @@ class Popup
 		this.binds();
 
 		// Enviamos un mensaje a [Streaming] para preguntar por el estado actual
-		this.sendMessage({ command: 'status' }, Popup.detect);
+		this.sendMessage({ command: 'status' }, this.detect);
 	}
 
 	/**
@@ -71,6 +71,7 @@ class Popup
 		// Desconectarnos
 		$('#disconnect').on('click', this.disconnect);
 
+		// Seleccionamos el campo de dirección
 		$('#session_url').on('click', function() { $(this).get(0).select(); });
 	}
 
@@ -79,6 +80,17 @@ class Popup
 	 * o si hemos accedido con una dirección compartida
 	 */
 	static detect( message ) {
+		// Ha ocurrido un problema
+		if ( typeof message == 'undefined' ) {
+
+			// Iván: No sé bien porque ocurre esto, pero en este caso
+			// solo mostramos el selector como si nada pasará...
+			$('.loading').hide();
+			$('.mode-selector').show();
+
+			return;
+		}
+
 		$('.loading').hide();
 
 		// Estamos en una sesión activa
@@ -92,7 +104,10 @@ class Popup
 		var session_id	= query.get('wootsie');
 
 		// No hay parametro con la id de la sesión
-		if ( session_id.length <= 0 ) return;
+		if ( session_id.length <= 0 ) {
+			$('.mode-selector').show();
+			return;
+		}
 
 		// Damos clic al botón de unirse a la sesión
 		$('.join-session-button').click();

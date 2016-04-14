@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Chat</title>
+
+	<!-- Estilo -->
+	<link rel="stylesheet" href="assets/css/chat.css" />
+
+	<!-- JS -->
+	<script src="assets/js/libs/jquery-2.2.3.min.js"></script>
+	<script src="assets/js/libs/firebase.js"></script>
+
+	<script src="assets/js/chat.js"></script>
+</head>
+<body>
+	<div class="wootsie-chat" id="wootsie-chat">
+		<div class="top-info">
+			<div class="leader">
+				<strong class="title">Líder:</strong>
+				<span>Andrea</span> - <span>39:09</span>
+			</div>
+
+			<div class="owner">
+				<strong class="title">Anfitrión:</strong>
+				<span>Iván</span>
+			</div>
+		</div>
+
+		<div class="messages-container">
+			<div class="single">
+				<strong class="name">Iván:</strong>
+				<p>Lorem ipsum testing test.</p>
+			</div>
+
+			<div class="single system">
+				<strong>Iván</strong> ha pausado la reproducción
+			</div>
+
+			<div class="single">
+				<strong class="name">Iván:</strong>
+				<p>Lorem ipsum testing test.</p>
+			</div>
+
+			<div class="single system">
+				<strong>Iván</strong> ha cambiado el tiempo a 30:09
+			</div>
+
+			<div class="single system">
+				<strong>Iván</strong> ha reanudado la reproducción
+			</div>
+		</div>
+
+		<div class="message-box">
+			<textarea id="chat-message" placeholder="Escribe tu mensaje..."></textarea>
+		</div>
+	</div>
+</body>
+</html>

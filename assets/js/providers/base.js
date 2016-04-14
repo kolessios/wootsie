@@ -9,39 +9,9 @@ var providers = {};
 var provider = null;
 
 /**
- * https://github.com/boyers/netflixparty-chrome/blob/master/content_script.js#L44
+ * Tolerancia para el tiempo de reproducción
  */
-var delay = function(milliseconds) {
-  return function(result) {
-	return new Promise(function(resolve, reject) {
-	  setTimeout(function() {
-		resolve(result);
-	  }, milliseconds);
-	});
-  };
-};
-
-/**
- * https://github.com/boyers/netflixparty-chrome/blob/master/content_script.js#L56
- */
-var delayUntil = function(condition, maxDelay) {
-  return function(result) {
-    var delayStep = 250;
-    var startTime = (new Date()).getTime();
-    var checkForCondition = function() {
-      if (condition()) {
-        return Promise.resolve(result);
-      }
-      if (maxDelay !== null && (new Date()).getTime() - startTime > maxDelay) {
-      	console.error('delayUntil timed out');
-      	 return Promise.resolve(result);
-        //return Promise.reject(Error('delayUntil timed out'));
-      }
-      return delay(delayStep)().then(checkForCondition);
-    };
-    return checkForCondition();
-  };
-};
+var tolerance = 2;
 
 /**
  * Clase base para representar un proveedor
@@ -180,6 +150,7 @@ class BaseProvider
 	 */
 	onOwnPaused() {
 		Streaming.touch();
+		Chat.state( Streaming.clientName, 'paused' );
 	}
 
 	/**
@@ -196,13 +167,26 @@ class BaseProvider
 	 */
 	onOwnPlay( e ) {
 		Streaming.touch();
+		Chat.state( Streaming.clientName, 'playing' );
 	}
 
 	/**
 	 * [Evento] Hemos cambiado la parte del Stream
 	 */
 	onSeek( e ) {
-		Streaming.touch();
+		// Esperamos 800ms
+		delay(800)().then(function() {
+			// Esperamos hasta que el estado sea "Cargando..." o siga reproduciendose
+			delayUntil(function() {
+				return ( provider.getState() == 'loading' || provider.getState() == 'playing' );
+			}, 1000)()
+
+			// Actualizamos en el servidor
+			.then(function() {
+				Streaming.touch();
+				Chat.seek( Streaming.clientName, provider.getCurrent() );
+			});
+		});		
 	}
 
 	/**
@@ -245,7 +229,11 @@ class BaseProvider
 	 * Reanuda la reproducción en un punto especifico
 	 */
 	seek( ms ) {
-		return delay(1)();
+		this.instance().currentTime = ms;
+
+		return delayUntil(function() {
+			return ( Math.floor(ms) - Math.floor(provider.getCurrent()) <= tolerance );
+		}, 10000)();
 	}
 
 	/**
@@ -275,6 +263,13 @@ class BaseProvider
 	 */
 	hideControls() {
 		return delay(1)();
+	}
+
+	/**
+	 * Devuelve el objeto donde debemos inyectar el chat
+	 */
+	injectChatAfterThis() {
+		return null;
 	}
 
 	/**
@@ -329,7 +324,7 @@ function getProvider( url ) {
 		let provider = providers[i];
 
 		// Proveedor actual
-		if ( provider.isWatching(url) ) {
+		if ( provider.isValid(url) || provider.isWatching(url) ) {
 			return provider;
 		}
 	}
@@ -341,5 +336,50 @@ function getProvider( url ) {
  * Agrega todos los proveedores disponibles
  */
 function addProviders() {
-	providers['netflix'] = new Netflix();
+	providers['netflix']	= new Netflix();
+	providers['clarovideo']	= new ClaroVideo();
+	providers['blim']		= new Blim();
 }
+
+/**
+ * [htmlEntities description]
+ * https://css-tricks.com/snippets/javascript/htmlentities-for-javascript/
+ */
+function htmlEntities(str) {
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+/**
+ * https://github.com/boyers/netflixparty-chrome/blob/master/content_script.js#L44
+ */
+var delay = function(milliseconds) {
+  return function(result) {
+	return new Promise(function(resolve, reject) {
+	  setTimeout(function() {
+		resolve(result);
+	  }, milliseconds);
+	});
+  };
+};
+
+/**
+ * https://github.com/boyers/netflixparty-chrome/blob/master/content_script.js#L56
+ */
+var delayUntil = function(condition, maxDelay) {
+  return function(result) {
+    var delayStep = 250;
+    var startTime = (new Date()).getTime();
+    var checkForCondition = function() {
+      if (condition()) {
+        return Promise.resolve(result);
+      }
+      if (maxDelay !== null && (new Date()).getTime() - startTime > maxDelay) {
+      	console.error('delayUntil timed out');
+      	 return Promise.resolve(result);
+        //return Promise.reject(Error('delayUntil timed out'));
+      }
+      return delay(delayStep)().then(checkForCondition);
+    };
+    return checkForCondition();
+  };
+};

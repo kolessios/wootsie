@@ -71,8 +71,8 @@ class Netflix extends BaseProvider
 	 */
 	binds() {
 		// Nuestras propias acciones
-		$('.player-play-pause.pause').on('click', this.onPaused);
-		$('.player-play-pause.play').on('click', this.onPlay);
+		$('body').on('click', '.player-play-pause.pause', this.onPaused);
+		$('body').on('click', '.player-play-pause.play', this.onPlay);
 		$('#scrubber-component').on('click', this.onSeek);
 	}
 
@@ -83,24 +83,6 @@ class Netflix extends BaseProvider
 		$('.player-play-pause.pause').off('click');
 		$('.player-play-pause.play').off('click');
 		$('#scrubber-component').off('click');
-	}
-
-	/**
-	 * [Evento] Hemos cambiado la parte del Stream
-	 */
-	onSeek( e ) {
-		// Esperamos 500ms
-		delay(500)().then(function() {
-			// Esperamos hasta que el estado sea "Cargando..." o siga reproduciendose
-			delayUntil(function() {
-				return ( provider.getState() == 'loading' );
-			}, 1000)()
-
-			// Actualizamos en el servidor
-			.then(function() {
-				Streaming.touch();
-			});
-		});
 	}
 
 	/**
@@ -183,7 +165,7 @@ class Netflix extends BaseProvider
 		// Esperamos hasta que el Stream se sincronize
 		.then(delayUntil(function() {
 			return ( Math.floor(ms) - Math.floor(provider.getCurrent()) <= 1 );
-		}, 5000))
+		}, 10000))
 
 		// Ocultamos los controles
 		.then( provider.hideControls );
@@ -234,5 +216,12 @@ class Netflix extends BaseProvider
 		player[0].dispatchEvent( new MouseEvent('mousemove', options) );
 
 		return delay(1)();
+	}
+
+	/**
+	 * Devuelve el objeto donde debemos inyectar el chat
+	 */
+	injectChatAfterThis() {
+		return $('#netflix-player');
 	}
 }

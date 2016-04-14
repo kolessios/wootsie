@@ -1,0 +1,163 @@
+/**
+ * Configuración
+ */
+
+$chat-width		: 300px
+$system-color	: #00A9CA
+$own-color		: #cccccc
+
+/**
+ * Netflix
+ */
+#netflix-player, .vph5-player.main-wrapper, blim-player-html5
+	transition: .3s width ease-in-out
+
+	&.chat-open
+		width: calc( 100% - 300px ) !important
+
+	&.chat-closed
+		width: calc( 100% - 20px ) !important
+
+body
+	overflow: hidden
+
+/**
+ * Chat
+ */
+.wootsie-chat
+	background: #0f0f0f
+	box-shadow: 1px 0 6px black inset
+	position: absolute 
+	right: 0
+	top: 0
+	bottom: 0
+	width: $chat-width
+	font-size: 12px
+	transition: all .3s ease-in-out
+
+	&.closed
+		background: #212121
+		right: -($chat-width - 20)
+		cursor: pointer
+
+		.top-info, .messages-container, .message-box
+			display: none
+
+		&.new-message
+			background: $system-color
+
+	#close-chat
+		position: absolute
+		top: 5px
+		right: 5px
+		color: white
+		text-decoration: none !important
+		font-size: 1.5em
+
+	.top-info
+		display: flex
+		padding: 10px
+		border-bottom: 2px solid black
+
+		.leader, .owner
+			flex: 1
+
+			.title
+				color: white
+				display: block
+				margin-bottom: 10px
+				font-weight: bold
+				font-size: 1.2em
+
+			span
+				color: white
+
+	.messages-container
+		border-top: 2px solid #262626
+		overflow: auto
+
+		.single
+			display: none
+			padding: 8px 15px
+			border-top: 1px solid #262626
+			border-bottom: 1px solid black
+			border-left: 2px solid $system-color
+
+			&:first-child
+				border-top: 0
+
+			&:hover
+				opacity: 0.9 !important
+
+			&.fade
+				opacity: 0.4
+
+			&.active
+				border-left-color: transparent
+				transition: .4s all ease-in-out
+
+			&.system
+				background: $system-color
+				text-shadow: 1px 1px 1px transparentize(black, 0.5)
+				text-align: center
+				border-top-color: #1ac0dd
+				border-bottom-color: #138599
+
+			&.own
+				p
+					color: $own-color !important
+
+			.name
+				display: block
+				margin-bottom: 1px
+				color: white
+
+				p
+					color: white
+
+	.message-box
+		textarea
+			background: #0F0F0F
+			width: 92%
+			height: 60px
+			color: $own-color
+			border: 0
+			padding: 10px
+			outline: none !important
+			font-size: 1.1em
+			margin-top: 5px
+			border-top: 2px solid black
+
+
+/**
+ * Scrollbar
+ */
+::-webkit-scrollbar
+	height: 15px
+
+::-webkit-scrollbar-thumb:vertical,
+::-webkit-scrollbar-thumb:horizontal
+	background-color: $system-color
+	border-radius: 15px
+	border: 3px solid black
+	cursor: pointer
+
+::-webkit-scrollbar-thumb:vertical:hover,
+::-webkit-scrollbar-thumb:horizontal:hover 
+	background-color: rgba(0, 0, 0, .8)
+
+::-webkit-scrollbar-track 
+	padding: 12px
+	background: black
+
+::-webkit-scrollbar-track:hover 
+	background-color: #F5F5F5
+
+::-webkit-scrollbar-corner 
+	background: transparent
+
+::-webkit-scrollbar-corner 
+	background-clip: padding-box
+	background-color: black
+	border: solid white
+	border-width: 3px 0 0 3px

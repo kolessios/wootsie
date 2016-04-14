@@ -11,7 +11,7 @@ var session = null;
 /**
  * Información de la sesión
  */
-var sessionData = null;
+var sessionInfo = null;
 
 /**
  * Referencia al cliente actual
@@ -22,16 +22,6 @@ var client = null;
  * Información del líder de la sesión (el más actualizado)
  */
 var leader = null;
-	
-/**
- * Interval de actualización
- */
-var updateInterval = null;
-
-/**
- * Tolerancia para el tiempo de reproducción
- */
-var tolerance = 2;
 
 /**
  * Controla la sincronización, las acciones con el Stream y la comunicación entre el proveedor y el Popup (Wootsie)
@@ -45,10 +35,10 @@ class Streaming
 		// Registramos los proveedores soportados
 		addProviders();
 
-		// Nombre del usuario
+		// Nombre del cliente
 		this.clientName = '';
 
-		// ¿Control total?
+		// ¿Autoridad?
 		this.control	= false;
 		this.owner		= false;
 
@@ -63,15 +53,17 @@ class Streaming
 	 * Hemos realizado alguna acción
 	 */
 	static touch() {
-		// Hay un "controlador" y no somos nosotros...
-		// Debemos sincronizarnos con el "controlador"
-		if ( sessionData.control > -1 && this.control == false ) {
+		// Hay un "autoridad" y no somos nosotros...
+		// Debemos sincronizarnos con el "autoridad"
+		if ( sessionInfo != null && sessionInfo.control != null && this.control == false ) {
 			this.sync = -1;
 			return;
 		}
 
 		this.sync = Date.now();
-		console.log('[Wootsie] Touch!');
+		this.update();
+
+		console.log('%c[Wootsie] Touch: %s', 'color:#1730ed', this.sync);
 	}
 
 	/**
@@ -105,31 +97,34 @@ class Streaming
 	static disconnect() {
 		if ( session == null ) return;
 
+		session.child('viewers').off('child_added');
+		session.child('viewers').off('child_removed');
+		session.off('value');
+
 		// Dejamos de actualizar
-		clearInterval( updateInterval );
+		clearInterval( Streaming.updateInterval );
 
 		// Avisamos al proveedor
 		provider.onDisconnected();
+
+		// Avisamos al chat
+		Chat.clear();
 
 		// Nos desconectamos
 		if ( client != null )
 			client.remove();
 
 		// Reiniciamos variables
-		session	= null;
-		client	= null;
-		leader	= null;
+		session		= null;
+		client		= null;
+		leader		= null;
+		sessionInfo	= null;
 
-		sessionData = null;
-
-		// ¿Control total?
 		Streaming.control	= false;
 		Streaming.owner		= false;
+		Streaming.sync		= -1;
 
-		// Tiempo de sincronización
-		Streaming.sync = -1;
-
-		console.log('[Wootsie] Desconexión éxitosa.');
+		console.error('%cDesconexión éxitosa.', 'color:orange');
 	}
 
 	/**
@@ -138,9 +133,8 @@ class Streaming
 	static create( name, control = false ) {
 		// Aún no ha cargado por completo
 		if ( provider.getId() == undefined ) {
-			console.warn('[Wootsie] Reintentando...');
+			console.count('Reintentando...');
 			delay(500)().then(function() { Streaming.create( name, control ); });
-
 			return;
 		}
 
@@ -148,7 +142,8 @@ class Streaming
 		// de la propia página
 		provider.ready();
 
-		// Ya estamos conectados
+		// Ya tenemos una sesión
+		// nos desconectamos...
 		if ( session != null ) {
 			Streaming.disconnect();
 		}
@@ -158,14 +153,16 @@ class Streaming
 			'owner'		: -1,
 			'control'	: -1,
 			'created'	: Date.now(),
+			'provider'	: provider.name,
 			
-			'media'		: provider.media,			
-			'viewers'	: { }
+			'media'		: provider.media,		
+			'viewers'	: {},
+			'chat' 		: {}
 		};
 
 		// Creamos la sesión en el servidor
 		session = server.push( data );
-		console.log('[Wootsie] Sesión ' + session.key() + ' creada');
+		console.log('%cSesión %s creada', 'color:green', session.key());
 
 		// Control total?
 		this.control	= control;
@@ -181,9 +178,8 @@ class Streaming
 	static join( name, sessionId ) {
 		// Aún no ha cargado por completo
 		if ( provider.getId() == undefined ) {
-			console.warn('[Wootsie] Reintentando...');
+			console.count('Reintentando...');
 			delay(500)().then(function() { Streaming.join( name, sessionId ); });
-
 			return;
 		}
 
@@ -200,19 +196,34 @@ class Streaming
 
 			// La sesión no existe
 			if ( val == null ) {
-				// Respondemos a Wootsie con la información de la sesión
-				Streaming.sendMessage({
-					'command': 'invalid-session'
-				});
-
+				// Respondemos a Wootsie
+				Streaming.sendMessage({ 'command': 'invalid-session' });
 				delay(500)().then( Streaming.disconnect );
-				console.error('[Wootsie] La sesión ' + sessionId + ' no existe');
 
+				console.error('La sesión %s no existe', sessionId);
 				return;
 			}
 
 			// Información
-			sessionData = val;
+			sessionInfo = (JSON.parse(JSON.stringify(val)));
+
+			// Autoridad total
+			if ( typeof val.viewers != 'undefined' && typeof val.viewers[val.control] != 'undefined' ) {
+				sessionInfo.control		= val.viewers[val.control];
+				sessionInfo.control.id	= val.control;
+			}
+			else {
+				sessionInfo.control = null;
+			}
+
+			// Anfitrión
+			if ( typeof val.viewers != 'undefined' &&  typeof val.viewers[val.owner] != 'undefined' ) {
+				sessionInfo.owner		= val.viewers[val.owner];
+				sessionInfo.owner.id	= val.owner;
+			}
+			else {
+				sessionInfo.owner = null;
+			}
 
 			let data = {
 				name	: Streaming.clientName,
@@ -223,17 +234,19 @@ class Streaming
 
 			// Agregamos al cliente
 			client = session.child('viewers').push( data );
+			console.log('%cNos hemos únido a la sesión %s (%s)\n', 'color:green', session.key(), client.key());
 
-			// Preparamos lo que ocurrira si nos desconectamos
+			// Eliminamos nuestra información al desconectarnos
 			client.onDisconnect().remove();
 
 			// Estamos listos
-			Streaming.onConnected();
+			// Iván: Esperamos 300ms para que los .on no se vuelvan locos
+			delay(300)().then(function() { Streaming.onConnected(); });
 		});
 	}
 
 	/**
-	 * Actualiza la información del cliente al servidor
+	 * Actualiza la información del cliente
 	 */
 	static update() {
 		let data = {
@@ -260,34 +273,17 @@ class Streaming
 		if ( this.control )
 			session.update({ control: client.key() });
 
-		// Obtenemos la información de la sesión
-		session.on('value', function( snapshot ) {
-			session.off('value');
-			let val = snapshot.val();
-
-			// Actualizamos la información
-			sessionData = val;
-		});
-
 		// Avisamos al proveedor
 		provider.onConnected();
+
+		// Empezamos a mandar nuestras actualizacaiones
+		Streaming.update();
+		Streaming.updateInterval = setInterval( Streaming.update, 300 );
 
 		// Binds
 		session.child('viewers').on('child_added', Streaming.onClientConnect);
 		session.child('viewers').on('child_removed', Streaming.onClientDisconnect);
-
-		// Nadie tiene control total, escuchamos por cualquier cambio
-		if ( sessionData.control == -1 ) {
-			session.child('viewers').on('value', Streaming.onUpdate);
-		}
-
-		// Solo escuchamos por los cambios del "controlador"
-		else {
-			session.child('viewers').child( sessionData.control ).on('value', Streaming.onUpdate);
-		}
-
-		// Empezamos a mandar actualizaciones del cliente
-		updateInterval = setInterval( this.update, 300 );
+		session.on('value', Streaming.onUpdate);
 
 		// Dirección para acceder a la sesión
 		var url = provider.getSessionUrl( session.key() );
@@ -302,27 +298,162 @@ class Streaming
 			'url'		: url
 		});
 
-		console.log('[Wootsie] ' + this.clientName + ' (' + client.key() + ') se ha únido a la sesión ' + session.key());
+		// Iniciamos el chat
+		Chat.init();
+
+		console.timeEnd('Preparado');
+		console.groupEnd();
 	}
 
 	/**
 	 * [Evento] Se ha únido un nuevo cliente a la transmisión
 	 */
 	static onClientConnect( snapshot ) {
+		var val = snapshot.val();
 
+		Chat.addMessage({
+			system: true,
+			message: '<strong>'+val.name+'</strong> se ha únido.'
+		});	
+
+		console.log('%c[Wootsie] %s se ha únido a la sesión.', 'color:#11c497', val.name);
 	}
 
 	/**
 	 * [Evento] Se ha únido un nuevo cliente a la transmisión
 	 */
 	static onClientDisconnect( snapshot ) {
+		var val = snapshot.val();
 
+		Chat.addMessage({
+			system: true,
+			message: '<strong>'+val.name+'</strong> se ha ido :('
+		});	
+
+		console.log('%c[Wootsie] %s se ha desconectado de la sesión.', 'color:darkred', val.name);
+	}
+
+	/**
+	 * [Evento] Se ha actualizado la información de la sesión
+	 */
+	static onUpdate( snapshot ) {
+		var val = snapshot.val();
+
+		// Información de nuestro streaming
+		var current = Math.floor( provider.getCurrent() );
+		var state 	= provider.getState();
+
+		// Actualizamos la información de la sesión
+		sessionInfo = (JSON.parse(JSON.stringify(val)));
+
+		// Autoridad total
+		if ( typeof val.viewers[val.control] != 'undefined' ) {
+			sessionInfo.control		= val.viewers[val.control];
+			sessionInfo.control.id	= val.control;
+		}
+		else {
+			sessionInfo.control = null;
+		}
+
+		// Anfitrión
+		if ( typeof val.viewers[val.owner] != 'undefined' ) {
+			sessionInfo.owner		= val.viewers[val.owner];
+			sessionInfo.owner.id	= val.owner;
+		}
+		else {
+			sessionInfo.owner = null;
+		}
+
+		// Líder de reproducción
+		var lead		= null;
+		var lastSync	= -2;
+
+		// No hay una "autoridad"
+		if ( val.control == -1 ) {
+			// Buscamos el más actualizado, un líder
+			for( let id in val.viewers ) 
+			{
+				let user = val.viewers[id];
+
+				if ( user.sync > lastSync ) {
+					lead		= user;
+					lead.id		= id;
+					lastSync	= user.sync;
+				}
+			}
+		}
+		else {
+			lead = sessionInfo.control;
+
+			// ¡La autoridad se ha desconectado!
+			if ( lead == null ) {
+				//Streaming.disconnect();
+				return;
+			}
+		}
+
+		// Nuestro líder actual
+		leader = lead;
+
+		// Actualizamos la información del chat
+		Chat.update();
+
+		// Ya estamos sincronizados
+		if ( leader.sync == (Streaming.sync+1) ) return;
+
+		// Somos el líder
+		if ( Streaming.imLeader() ) return;
+
+		// El líder esta cargando otra parte
+		// del Stream, esperamos...
+		if ( leader.state === 'loading' ) {
+			//provider.pause();
+
+			console.log('[Wootsie][%s] Esperando al líder %s...', leader.sync, leader.state);
+			return;
+		}
+
+		console.group('[Wootsie] Sincronización %s', leader.sync);
+
+		let leaderCurrent = Math.floor(leader.current);
+
+		// Debemos sincronizar el tiempo
+		if ( leaderCurrent > (current+tolerance) || leaderCurrent < (current-tolerance) ) {
+			// Sincronizamos el tiempo y después el estado
+			provider.seek( leader.current ).then(function() {
+				provider.setState( leader.state );
+				console.warn('Estado: %s -> %s', state, leader.state);
+			});
+
+			console.warn('Tiempo: %s -> %s', current, leaderCurrent);
+
+			// Notificamos en el chat
+			Chat.seek( leader.name, leaderCurrent );
+		}
+
+		// Sincronizamos el estado
+		else if ( state != leader.state ) {
+			if ( !Streaming.imLeader() ) {
+				provider.setState( leader.state );
+				console.warn('Estado: %s -> %s', state, leader.state);
+			}
+
+			// Notificamos en el chat
+			Chat.state( leader.name, leader.state );
+		}
+
+		// Sincronizamos: Disminuimos 1 para que el líder original sincronize
+		// a los que recien entran.
+		Streaming.sync = ( leader.sync - 1 );
+
+		console.log('Líder: %s', leader.name);
+		console.groupEnd();
 	}
 
 	/**
 	 * [Evento] Se ha actualizado la información de algún cliente
 	 */
-	static onUpdate( snapshot ) {
+	/*static onUpdate( snapshot ) {
 		var val = snapshot.val();
 
 		// Información de nuestro streaming
@@ -333,7 +464,7 @@ class Streaming
 		var lead = null;
 
 		// No hay nadie con control total, revisamos la lista...
-		if ( sessionData.control == -1 ) {
+		if ( sessionInfo.control == -1 ) {
 			var lastSync = -1;
 
 			for( let id in val ) {
@@ -346,7 +477,9 @@ class Streaming
 				// nuestra última sincronización
 				if ( user.sync > (Streaming.sync+1) ) {
 					if ( user.sync > lastSync ) {
-						lead = user;
+						lead	= user;
+						lead.id	= id;
+
 						lastSync = user.sync;
 					}
 				}
@@ -355,16 +488,17 @@ class Streaming
 
 		// "Controlador" = Líder
 		else {
-			lead = val;
+			lead	= val;
+			lead.id	= snapshot.key();
 
-			// ¡El controlador se ha desconectado!
+			// ¡El autoridad se ha desconectado!
 			if ( lead == null ) {
 				Streaming.disconnect();
 				return;
 			}
 
 			// No nos interesa nuestras propias actualizaciones
-			if ( snapshot.key() == client.key() ) return;
+			if ( lead.id == client.key() ) return;
 
 			// Ya estamos sincronizados...
 			if ( lead.sync == (Streaming.sync+1) ) return;
@@ -379,7 +513,8 @@ class Streaming
 		// El líder esta cargando otra parte
 		// del Stream, esperamos...
 		if ( leader.state === 'loading' ) {
-			provider.pause();
+			if ( !Streaming.imLeader() )
+				provider.pause();
 
 			console.log('[Wootsie]['+leader.sync+'] Esperando al líder... ' + leader.state);
 			return;
@@ -389,54 +524,82 @@ class Streaming
 
 		// Debemos sincronizar el tiempo
 		if ( leaderCurrent > (current+tolerance) || leaderCurrent < (current-tolerance) ) {
-			// Sincronizamos el tiempo y después el estado
-			provider.seek( leader.current ).then(function() {
-				provider.setState( leader.state );
-				console.warn('[Wootsie]['+leader.sync+'] Estado: ' + state + ' -> ' + leader.state);
-			});
+			if ( !Streaming.imLeader() ) {
+				// Sincronizamos el tiempo y después el estado
+				provider.seek( leader.current ).then(function() {
+					provider.setState( leader.state );
+					console.warn('[Wootsie]['+leader.sync+'] Estado: ' + state + ' -> ' + leader.state);
+				});
 
-			console.warn('[Wootsie]['+leader.sync+'] Sincronizando Tiempo: ' + current + ' -> ' + leaderCurrent);
+				console.warn('[Wootsie]['+leader.sync+'] Sincronizando Tiempo: ' + current + ' -> ' + leaderCurrent);
+			}
+
+			// Notificamos en el chat
+			Chat.seek( leader.name, leaderCurrent );
 		}
 
 		// Sincronizamos el estado
 		else if ( state != leader.state ) {
-			provider.setState( leader.state );
-			console.warn('[Wootsie]['+leader.sync+'] Sincronizando Estado: ' + state + ' -> ' + leader.state);
+			if ( !Streaming.imLeader() ) {
+				provider.setState( leader.state );
+				console.warn('[Wootsie]['+leader.sync+'] Sincronizando Estado: ' + state + ' -> ' + leader.state);
+			}
+
+			// Notificamos en el chat
+			Chat.state( leader.name, leader.state );
 		}
 
-		// Sincronizamos: Disminuimos 1 para que el líder original sincronize
-		// a los que recien entran.
-		Streaming.sync = ( leader.sync - 1 );
+		if ( !Streaming.imLeader() ) {
+			// Sincronizamos: Disminuimos 1 para que el líder original sincronize
+			// a los que recien entran.
+			Streaming.sync = ( leader.sync - 1 );
 
-		console.log('[Wootsie] Líder: ' + leader.name + ' - Sincronización: ' + leader.sync);
-		console.log('');
-	}
+			console.log('[Wootsie] Líder: ' + leader.name + ' - Sincronización: ' + leader.sync);
+			console.log('');
+		}
+	}*/
 
 	/**
 	 * [Evento] Hemos recibido un mensaje de Wootsie
 	 */
 	static onChromeMessage( message, sender, response ) {
-		//console.log(message);
-
 		// Creamos la sesión
 		if ( message.command === 'create-session' ) {
+			console.group('[Wootsie]');
+			console.time('Preparado');
+
 			Streaming.create( message.name, message.control );
 		}
 
 		// Unirnos a la sesión
-		else if ( message.command === 'join-session' ) {
-			Streaming.join( message.name, message.sessionid );
+		if ( message.command === 'join-session' ) {
+			try {
+				console.group('[Wootsie]');
+				console.time('Preparado');
+
+				Streaming.join( message.name, message.sessionid );
+			} catch( e ) {
+				console.groupEnd()
+
+				// Respondemos a Wootsie
+				Streaming.sendMessage({ 'command': 'invalid-session' });
+				delay(500)().then( Streaming.disconnect );
+
+				console.error('[Wootsie] La sesión %s no existe', sessionId);
+			}
 		}
 
 		// Wootsie nos solicita nuestro estado actual
-		else if ( message.command === 'status' ) {
+		if ( message.command === 'status' ) {
 			if ( session == null ) {
 				var data = {
-					status: 'disconnected',
+					command	: 'response-status',
+					status	: 'disconnected',
 				};
 			}
 			else {
 				var data = {
+					command		: 'response-status',
 					status		: 'connected',
 					sessionId	: session.key(), 
 					url			: provider.getSessionUrl( session.key() )
@@ -448,7 +611,7 @@ class Streaming
 		}
 
 		// Queremos desconectarnos
-		else if ( message.command === 'disconnect' ) {
+		if ( message.command === 'disconnect' ) {
 			Streaming.disconnect();
 
 			// Response
@@ -461,6 +624,13 @@ class Streaming
 	 */
 	static sendMessage( message, response = null ) {
 		chrome.runtime.sendMessage( message, response );
+	}
+
+	/**
+	 * Devuelve si soy el líder
+	 */
+	static imLeader() {
+		return ( leader.id == client.key() );
 	}
 }
 
