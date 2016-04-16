@@ -1,6 +1,3 @@
-var scrubber;
-var options;
-
 class ClaroVideo extends BaseProvider
 {
 	/**
@@ -16,9 +13,9 @@ class ClaroVideo extends BaseProvider
 	}
 
 	/**
-	 * Instancia al <video> del Stream
+	 * Objeto del <video>
 	 */
-	instance() {
+	video() {
 		return $('.video-container video').get(0);
 	}
 
@@ -26,7 +23,7 @@ class ClaroVideo extends BaseProvider
 	 * Devuelve la ID del Stream
 	 */
 	getId() {
-		return '704602'; // TODO
+		return $.query.get('group_id');
 	}
 
 	/**

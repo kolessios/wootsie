@@ -13,7 +13,7 @@ class Background
 		// Se ha actualizado la información de alguna pestaña
 		chrome.tabs.onUpdated.addListener( Background.detect );
 
-		// Examinamos la activa
+		// Examinamos la pestaña activa
 		chrome.tabs.query({active: true}, function( tab ) {
 			tab = tab[0];
 			Background.detect( tab.id, null, tab );
@@ -62,7 +62,7 @@ class Background
 			}
 			else {
 				chrome.pageAction.hide( tabId );
-				chrome.pageAction.setTitle( { tabId: tabId, title: "Un momento..." } );
+				chrome.pageAction.setTitle( { tabId: tabId, title: "Cargando..." } );
 			}
 		}
 
@@ -70,16 +70,17 @@ class Background
 		else if ( Background.isValidProvider(tab.url) ) {
 			// Ocultamos el icono
 			chrome.pageAction.hide( tabId );
-			chrome.pageAction.setTitle( { tabId: tabId, title: "Inicia algún capitulo/pelicula primero" } );
+			chrome.pageAction.setTitle( { tabId: tabId, title: "Inicia alguna serie/película." } );
 		}
 
 		// No estamos en una página válida
 		else {
 			// Ocultamos el icono
 			chrome.pageAction.hide( tabId );
-			chrome.pageAction.setTitle( { tabId: tabId, title: "Accede a un proveedor válido" } );
+			chrome.pageAction.setTitle( { tabId: tabId, title: "No se puede usar Wootsie aquí." } );
 		}
 	}
 }
 
+// Iniciamos
 Background.init();

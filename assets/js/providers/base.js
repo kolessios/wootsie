@@ -34,19 +34,19 @@ class BaseProvider
 		// Dirección donde miramos la transmisión
 		this.viewUrl = '';
 
-		// Media
+		// Información del Stream
 		this.media = {
-			id: '',
-			title: '',
+			id		: '',
+			title	: '',
 			duration: '',
-			url: document.location.href
+			url		: document.location.href
 		};
 	}
 
 	/**
-	 * Instancia al <video> del Stream
+	 * Objeto del <video>
 	 */
-	instance() {
+	video() {
 		return $('video').get(0);
 	}
 
@@ -61,34 +61,34 @@ class BaseProvider
 	 * Devuelve el título del Stream
 	 */
 	getTitle() {
-		return 'BaseProvider - Title - Chapter 1';
+		return 'Invalid';
 	}
 
 	/**
 	 * Devuelve la duración del Stream
 	 */
 	getDuration() {
-		if ( this.instance() == undefined ) return -1;
-		return this.instance().duration;
+		if ( this.video() == undefined ) return -1;
+		return this.video().duration;
 	}
 
 	/**
 	 * Devuelve el tiempo actual de la reproducción
 	 */
 	getCurrent() {
-		if ( this.instance() == undefined ) return -1;
-		return this.instance().currentTime;
+		if ( this.video() == undefined ) return -1;
+		return this.video().currentTime;
 	}
 
 	/**
 	 * Devuelve el estado actual de la reproducción
 	 */
 	getState() {
-		if ( this.instance().readyState < 4 ) {
+		if ( this.video().readyState < 4 ) {
 			return 'loading';
 		}
 
-		if ( this.instance().paused ) {
+		if ( this.video().paused ) {
 			return 'paused';
 		}
 
@@ -108,31 +108,31 @@ class BaseProvider
 	 * Agregamos escuchas a eventos del reproductor
 	 */
 	binds() {
-		this.instance().onpaused		= this.onPaused;
-		this.instance().onplay			= this.onPlay;
-		this.instance().onplaying		= this.onPlaying;
-		this.instance().ontimeupdate	= this.onTimeUpdate;
+		this.video().onpaused		= this.onPaused;
+		this.video().onplay			= this.onPlay;
+		this.video().onplaying		= this.onPlaying;
+		this.video().ontimeupdate	= this.onTimeUpdate;
 	}
 
 	/**
 	 * Limpiamos los escuchas
 	 */
 	clear() {
-		this.instance().onpaused		= null;
-		this.instance().onplay			= null;
-		this.instance().onplaying		= null;
-		this.instance().ontimeupdate	= null;
+		this.video().onpaused		= null;
+		this.video().onplay			= null;
+		this.video().onplaying		= null;
+		this.video().ontimeupdate	= null;
 	}
 
 	/**
-	 * [Evento] Nos hemos conectado
+	 * [Evento] Nos hemos conectado a una sesión
 	 */
 	onConnected() { 
 		this.binds();
 	}
 
 	/**
-	 * [Evento] Nos hemos desconectado
+	 * [Evento] Nos hemos desconectado de la sesión
 	 */
 	onDisconnected() {
 		this.clear();
@@ -207,7 +207,7 @@ class BaseProvider
 	 * Pausa la reproducción del Stream
 	 */
 	pause() {
-		this.instance().pause();
+		this.video().pause();
 
 		return delayUntil(function() {
 			return ( provider.getState() === 'paused' );
@@ -218,7 +218,7 @@ class BaseProvider
 	 * Reanuda la reproducción del Stream
 	 */
 	play() {
-		this.instance().play();
+		this.video().play();
 
 		return delayUntil(function() {
 			return ( provider.getState() === 'playing' );
@@ -229,7 +229,7 @@ class BaseProvider
 	 * Reanuda la reproducción en un punto especifico
 	 */
 	seek( ms ) {
-		this.instance().currentTime = ms;
+		this.video().currentTime = ms;
 
 		return delayUntil(function() {
 			return ( Math.floor(ms) - Math.floor(provider.getCurrent()) <= tolerance );
@@ -281,17 +281,19 @@ class BaseProvider
 	}
 
 	/**
+	 * Devuelve la lista de parámetros para la dirección para compartir
+	 */
+	getFixedQuery( sessionId ) {
+		return $.query.set('wootsie', sessionId);
+	}
+
+	/**
 	 * Devuelve la dirección especial para compartir.
 	 * La dirección de reproducción con la ID de la sesión
 	 */
 	getSessionUrl( sessionId ) {
-		var url = ( typeof Popup == 'function' ) ? Popup.tab.url : document.location.href;
-
-		var query 		= $.query.load( url );
-		var newQuery 	= query.remove('trackId').remove('tctx').set('wootsie', sessionId).toString();
-
-		var split = url.split('?');
-		return split[0] + newQuery;
+		var split = document.location.href.split('?');
+		return split[0] + this.getFixedQuery( sessionId ).toString();
 	}
 
 	/**
@@ -339,6 +341,8 @@ function addProviders() {
 	providers['netflix']	= new Netflix();
 	providers['clarovideo']	= new ClaroVideo();
 	providers['blim']		= new Blim();
+	providers['youtube']	= new YouTube();
+	providers['vimeo']		= new Vimeo(); // TODO: Pruebas
 }
 
 /**

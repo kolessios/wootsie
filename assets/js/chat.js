@@ -46,9 +46,6 @@ class Chat
 
 		// Algunos proveedores tienen el click bloqueado...
 		$('#chat-message').on('click', function() { $('#chat-message').focus(); });
-		/*$('#chat-message').on('keydown', function(e) { 
-			$('#chat-message')[0].dispatchEvent( new KeyboardEvent('keydown', e.originalEvent) );
-		});*/
 
 		console.log('¡Preparado!');
 		console.groupEnd();
@@ -69,7 +66,9 @@ class Chat
 		$('#close-chat').off('click');
 
 		player.removeClass('chat-open').removeClass('chat-closed');
-		$('#wootsie-chat').remove();
+		chat.remove();
+
+		$('body').removeClass( provider.name.toLowerCase() );
 	}
 
 	/**
@@ -304,6 +303,8 @@ class Chat
 		// Contenedor
 		chat = $('#wootsie-chat');
 		chat.addClass( provider.name.toLowerCase() );
+
+		$('body').addClass( provider.name.toLowerCase() );
 
 		// Binds
 		Chat.binds();

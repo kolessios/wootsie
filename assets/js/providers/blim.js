@@ -1,6 +1,3 @@
-var scrubber;
-var options;
-
 class Blim extends BaseProvider
 {
 	/**
@@ -16,9 +13,9 @@ class Blim extends BaseProvider
 	}
 
 	/**
-	 * Instancia al <video> del Stream
+	 * Objeto del <video>
 	 */
-	instance() {
+	video() {
 		return $('blim-player-media video').get(0);
 	}
 
@@ -86,7 +83,9 @@ class Blim extends BaseProvider
 	 * Devuelve el objeto donde debemos inyectar el chat
 	 */
 	injectChatAfterThis() {
-		//return null;
-		return $('blim-player-html5');
+		// TODO: Resolver un bug que ocasiona que el reproductor detecte
+		// los clics hechos sobre el 300px más a la derecha de lo que realmente estan
+		return null;
+		//return $('blim-player-html5');
 	}
 }

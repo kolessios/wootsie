@@ -132,9 +132,8 @@ class Popup
 	 * Regres a la selección de modo
 	 */
 	static back() {
-		$('.join-box, .create-box, .session-details').fadeOut('fast', function() {
-			$('.mode-selector').fadeIn('fast');
-		});
+		$('.join-box, .create-box, .session-details').hide();
+		$('.mode-selector').fadeIn('fast');
 	}
 
 	/**

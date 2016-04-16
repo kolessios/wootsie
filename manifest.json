@@ -35,6 +35,8 @@
 			"assets/js/providers/netflix.js", 
 			"assets/js/providers/clarovideo.js", 
 			"assets/js/providers/blim.js", 
+			"assets/js/providers/youtube.js", 
+			"assets/js/providers/vimeo.js",
 
 			"background.js"
 		],
@@ -43,13 +45,15 @@
 
 	"content_scripts": [
 		{
-			"matches": ["https://www.netflix.com/*", "http://playerhtml5.clarovideo.net/*", "http://www.blim.com/*"],
+			"matches": ["https://www.netflix.com/*", "http://playerhtml5.clarovideo.net/*", "http://www.blim.com/*", "https://www.youtube.com/*", "https://vimeo.com/*"],
      		"css": ["assets/css/chat.css"],
       		"js": [
       			"assets/js/providers/base.js", 
 				"assets/js/providers/netflix.js",
 				"assets/js/providers/clarovideo.js",
-				"assets/js/providers/blim.js", 
+				"assets/js/providers/blim.js",
+				"assets/js/providers/youtube.js",
+				"assets/js/providers/vimeo.js",
 
       			"assets/js/libs/firebase.js",
       			"assets/js/libs/jquery-2.2.3.min.js", 

@@ -18,7 +18,7 @@ class Netflix extends BaseProvider
 	/**
 	 * Instancia al <video> del Stream
 	 */
-	instance() {
+	video() {
 		return $('.player-video-wrapper video').get(0);
 	}
 
@@ -223,5 +223,12 @@ class Netflix extends BaseProvider
 	 */
 	injectChatAfterThis() {
 		return $('#netflix-player');
+	}
+
+	/**
+	 * Devuelve la lista de parámetros para la dirección para compartir
+	 */
+	getFixedQuery( sessionId ) {
+		return $.query.remove('trackId').remove('tctx').set('wootsie', sessionId);
 	}
 }

@@ -1,3 +1,28 @@
+/**
+ * Configuración
+ */
+
+$main-color	: #00A9CA
+
+/**
+ * Tipografías
+ */
+
+@font-face
+	font-family: 'Fira Code'
+	font-style: normal
+	font-weight: 400
+	src: local('Fira Code'), url('../fonts/FiraCode-Regular.otf') format('otf')
+
+@font-face
+	font-family: 'Fira Code'
+	font-style: normal
+	font-weight: 300
+	src: local('Fira Code Light'), url('../fonts/FiraCode-Light.otf') format('otf')
+
+/**
+ * Predeterminado
+ */
 body
 	font-family: Roboto, Arial, sans-serif
 	width: 320px
@@ -19,11 +44,10 @@ h1, h2, h3, h4, h5
  */
 .provider-logo
 	text-align: center
-	border-bottom: 1px solid #F2F2F2
 	padding: 10px 0
 
 	img 
-		max-height: 20px
+		max-height: 30px
 
 /**
  * Selección de modo
@@ -42,14 +66,13 @@ h1, h2, h3, h4, h5
 			transition: all .2s ease-in-out
 
 			&:hover
-				color: black
+				color: $main-color
 				background: #F2F2F2
 
 /**
  * Caja de carga
  */
 .loading
-	//display: none
 	text-align: center
 
 	h2
@@ -111,7 +134,26 @@ h1, h2, h3, h4, h5
 		text-align: center
 		padding: 8px 15px
 		border: 0
-		background: #FF0A16
+		background: $main-color
 		color: white
 		font-weight: 900
 		cursor: pointer
+		font-family: Segoe UI, Arial, sans-serif
+		font-weight: 400
+		font-size: 0.9em
+		width: 100px
+
+/**
+ * Pie de página
+ */
+.footer
+	margin-top: 10px
+	text-align: center
+
+	a
+		display: block
+		font-size: 0.9em
+		font-family: Fira Code, Arial, sans-serif
+		font-weight: 400
+		color: $main-color
+		text-decoration: none
