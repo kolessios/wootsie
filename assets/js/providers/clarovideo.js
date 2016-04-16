@@ -9,7 +9,7 @@ class ClaroVideo extends BaseProvider
 		this.name		= 'ClaroVideo';
 		this.logo 		= 'claro.png';
 		this.baseUrl	= 'https://www.clarovideo.com';
-		this.viewUrl	= 'http://playerhtml5.clarovideo.net/playerhtml5/mexico/homeuser/';
+		this.viewUrl	= 'http://playerhtml5.clarovideo.net/playerhtml5/';
 	}
 
 	/**
@@ -72,8 +72,8 @@ class ClaroVideo extends BaseProvider
 	 * Limpiamos los escuchas
 	 */
 	clear() {
-		$('vph5-play-pause-button .fa-pause').off('click');
-		$('vph5-play-pause-button .fa-play').off('click');
+		$('body').off('click', 'vph5-play-pause-button .fa-pause');
+		$('body').off('click', 'vph5-play-pause-button .fa-play');
 		$('vph5-scrub-bar').off('click');
 	}
 

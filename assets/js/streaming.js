@@ -124,7 +124,7 @@ class Streaming
 		Streaming.owner		= false;
 		Streaming.sync		= -1;
 
-		console.error('%cDesconexión éxitosa.', 'color:orange');
+		console.log('%cDesconexión éxitosa.', 'color:orange');
 	}
 
 	/**
@@ -183,6 +183,10 @@ class Streaming
 			return;
 		}
 
+		// Dejamos que el proveedor recolecte información
+		// de la propia página
+		provider.ready();
+
 		// Nombre del Cliente
 		this.clientName = name;
 
@@ -201,6 +205,16 @@ class Streaming
 				delay(500)().then( Streaming.disconnect );
 
 				console.error('La sesión %s no existe', sessionId);
+				return;
+			}
+
+			// Esta sesión no es para esta transmisión
+			if ( val.media.id != provider.media.id || val.provider != provider.name ) {
+				// Respondemos a Wootsie
+				Streaming.sendMessage({ 'command': 'invalid-streaming' });
+				delay(500)().then( Streaming.disconnect );
+
+				console.error('La sesión %s no es válida para esta transmisión', sessionId);
 				return;
 			}
 
@@ -451,115 +465,6 @@ class Streaming
 	}
 
 	/**
-	 * [Evento] Se ha actualizado la información de algún cliente
-	 */
-	/*static onUpdate( snapshot ) {
-		var val = snapshot.val();
-
-		// Información de nuestro streaming
-		var current = Math.floor( provider.getCurrent() );
-		var state 	= provider.getState();
-
-		// Líder actual
-		var lead = null;
-
-		// No hay nadie con control total, revisamos la lista...
-		if ( sessionInfo.control == -1 ) {
-			var lastSync = -1;
-
-			for( let id in val ) {
-				// No nos interesa nuestras propias actualizaciones
-				if ( id == client.key() ) continue; 
-
-				let user = val[id];
-
-				// Este usuario ha hecho algo después de 
-				// nuestra última sincronización
-				if ( user.sync > (Streaming.sync+1) ) {
-					if ( user.sync > lastSync ) {
-						lead	= user;
-						lead.id	= id;
-
-						lastSync = user.sync;
-					}
-				}
-			}
-		}
-
-		// "Controlador" = Líder
-		else {
-			lead	= val;
-			lead.id	= snapshot.key();
-
-			// ¡El autoridad se ha desconectado!
-			if ( lead == null ) {
-				Streaming.disconnect();
-				return;
-			}
-
-			// No nos interesa nuestras propias actualizaciones
-			if ( lead.id == client.key() ) return;
-
-			// Ya estamos sincronizados...
-			if ( lead.sync == (Streaming.sync+1) ) return;
-		}
-
-		// ¡Todos estamos sincronizados! :)
-		if ( lead == null ) return;
-
-		// Nuestro líder actual
-		leader = lead;
-
-		// El líder esta cargando otra parte
-		// del Stream, esperamos...
-		if ( leader.state === 'loading' ) {
-			if ( !Streaming.imLeader() )
-				provider.pause();
-
-			console.log('[Wootsie]['+leader.sync+'] Esperando al líder... ' + leader.state);
-			return;
-		}
-
-		let leaderCurrent = Math.floor(leader.current);
-
-		// Debemos sincronizar el tiempo
-		if ( leaderCurrent > (current+tolerance) || leaderCurrent < (current-tolerance) ) {
-			if ( !Streaming.imLeader() ) {
-				// Sincronizamos el tiempo y después el estado
-				provider.seek( leader.current ).then(function() {
-					provider.setState( leader.state );
-					console.warn('[Wootsie]['+leader.sync+'] Estado: ' + state + ' -> ' + leader.state);
-				});
-
-				console.warn('[Wootsie]['+leader.sync+'] Sincronizando Tiempo: ' + current + ' -> ' + leaderCurrent);
-			}
-
-			// Notificamos en el chat
-			Chat.seek( leader.name, leaderCurrent );
-		}
-
-		// Sincronizamos el estado
-		else if ( state != leader.state ) {
-			if ( !Streaming.imLeader() ) {
-				provider.setState( leader.state );
-				console.warn('[Wootsie]['+leader.sync+'] Sincronizando Estado: ' + state + ' -> ' + leader.state);
-			}
-
-			// Notificamos en el chat
-			Chat.state( leader.name, leader.state );
-		}
-
-		if ( !Streaming.imLeader() ) {
-			// Sincronizamos: Disminuimos 1 para que el líder original sincronize
-			// a los que recien entran.
-			Streaming.sync = ( leader.sync - 1 );
-
-			console.log('[Wootsie] Líder: ' + leader.name + ' - Sincronización: ' + leader.sync);
-			console.log('');
-		}
-	}*/
-
-	/**
 	 * [Evento] Hemos recibido un mensaje de Wootsie
 	 */
 	static onChromeMessage( message, sender, response ) {
@@ -636,3 +541,4 @@ class Streaming
 
 // Comenzamos
 Streaming.init();
+console.log('[Streaming]');

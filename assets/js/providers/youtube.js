@@ -30,10 +30,25 @@ class YouTube extends BaseProvider
 	 * Agregamos escuchas a eventos del reproductor
 	 */
 	binds() {
-		// Nuestras propias acciones
-		// Iván: Por ahora esto funciona bien, pero no es lo mejor...
-		$('body').on('click', '.ytp-play-button', this.onPaused);
-		$('body').on('click', '.ytp-play-button', this.onPlay);
+		// Clic en reproducir/pausar
+		$('body').on('click', '.ytp-play-button', function(e) {
+			if ( provider.getState() == 'playing' ) {
+				provider.onPaused(e);
+			}
+			else {
+				provider.onPlay(e);
+			}
+		});
+
+		// Clic en el vídeo
+		$('body').on('click', 'video', function(e) {
+			if ( provider.getState() == 'playing' ) {
+				provider.onPaused(e);
+			}
+			else {
+				provider.onPlay(e);
+			}
+		});
 
 		$('.ytp-progress-bar-container').on('click', this.onSeek);
 	}
@@ -42,7 +57,7 @@ class YouTube extends BaseProvider
 	 * Limpiamos los escuchas
 	 */
 	clear() {
-		$('.ytp-play-button').off('click');
+		$('body').off('click', '.ytp-play-button');
 		$('.ytp-progress-bar-container').off('click');
 	}
 }

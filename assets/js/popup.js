@@ -221,9 +221,16 @@ class Popup
 			Popup.connected( message );
 		}
 
-		// Sesión inválida!
+		// Sesión inexistente!
 		if ( message.command === 'invalid-session' ) {
-			$('.join-box .error-msg').show();
+			$('.join-box .error-msg').html('¡La sesión no existe! Quizá haya caducado o lo has escrito incorrectamente.').show();
+			$('.join-box').show();
+			$('.loading').hide();
+		}
+
+		// Sesión inválida!
+		if ( message.command === 'invalid-streaming' ) {
+			$('.join-box .error-msg').html('¡La sesión es inválida! No puedes unirte a esta sesión.').show();
 			$('.join-box').show();
 			$('.loading').hide();
 		}

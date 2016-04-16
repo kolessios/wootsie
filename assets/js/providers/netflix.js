@@ -80,8 +80,8 @@ class Netflix extends BaseProvider
 	 * Limpiamos los escuchas
 	 */
 	clear() {
-		$('.player-play-pause.pause').off('click');
-		$('.player-play-pause.play').off('click');
+		$('body').off('click', '.player-play-pause.pause');
+		('body').off('click', '.player-play-pause.play');
 		$('#scrubber-component').off('click');
 	}
 

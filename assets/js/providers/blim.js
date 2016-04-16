@@ -9,7 +9,7 @@ class Blim extends BaseProvider
 		this.name		= 'Blim';
 		this.logo 		= 'blim.jpg';
 		this.baseUrl	= 'http://www.blim.com';
-		this.viewUrl	= '/player';
+		this.viewUrl	= this.baseUrl + '/';
 	}
 
 	/**
@@ -74,8 +74,8 @@ class Blim extends BaseProvider
 	 * Limpiamos los escuchas
 	 */
 	clear() {
-		$('.blim-player-controls-button--pause').off('click');
-		$('.blim-player-controls-button--play').off('click');
+		$('body').off('click', '.blim-player-controls-button--pause');
+		$('body').off('click', '.blim-player-controls-button--play');
 		$('.blim-player-scrub-bar').off('click');
 	}
 

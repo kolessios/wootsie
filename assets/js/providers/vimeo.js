@@ -48,7 +48,8 @@ class Vimeo extends BaseProvider
 	 * Limpiamos los escuchas
 	 */
 	clear() {
-		$('.play.state-playing, .play.state-paused').off('click');
+		$('body').off('click', '.play.state-playing');
+		$('body').off('click', '.play.state-paused');
 		$('.controls .progress').off('click');
 	}
 }
