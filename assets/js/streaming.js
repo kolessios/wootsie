@@ -132,7 +132,7 @@ class Streaming
 	 */
 	static create( name, control = false ) {
 		// Aún no ha cargado por completo
-		if ( provider.getId() == undefined ) {
+		if ( provider.getId() == undefined || provider.getState() == 'loading' ) {
 			console.count('Reintentando...');
 			delay(500)().then(function() { Streaming.create( name, control ); });
 			return;
@@ -177,7 +177,7 @@ class Streaming
 	 */
 	static join( name, sessionId ) {
 		// Aún no ha cargado por completo
-		if ( provider.getId() == undefined ) {
+		if ( provider.getId() == undefined || provider.getState() == 'loading' ) {
 			console.count('Reintentando...');
 			delay(500)().then(function() { Streaming.join( name, sessionId ); });
 			return;

@@ -301,7 +301,7 @@ class BaseProvider
 	 */
 	isValid( url = null ) {
 		if ( url.indexOf(this.baseUrl) > -1 )
-				return true;
+			return true;
 
 		return false;
 	}
@@ -311,7 +311,7 @@ class BaseProvider
 	 */
 	isWatching( url = null ) {
 		if ( url.indexOf(this.viewUrl) > -1 )
-				return true;
+			return true;
 
 		return false;
 	}
@@ -321,6 +321,7 @@ class BaseProvider
  * Devuelve el proveedor para la dirección web
  */
 function getProvider( url ) {
+	console.log(url);
 	// Buscamos entre todos los proveedores
 	for( let i in providers ) {
 		let provider = providers[i];

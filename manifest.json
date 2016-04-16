@@ -3,13 +3,9 @@
 	"name": "Wootsie",
 	"version": "0.1",
 	"version_name": "beta 1",
-
-	//"default_locale": "es",
-	"description": "Wootsie te permite ver sincronizadamente con tus amigos y familiares tus series y películas favoritas de los servicios de Streaming más populares.",
-
+	"description": "Ve sincronizadamente tus series y películas favoritas de Netflix, ClaroVideo, Blim y Youtube.",
 	"author": "Ivan Bravo Bravo",
 	"homepage_url": "http://sie.woots.mx/",
-
 	"minimum_chrome_version": "49",
 	"offline_enabled": false,
 
