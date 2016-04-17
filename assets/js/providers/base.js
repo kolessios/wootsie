@@ -14,6 +14,12 @@ var provider = null;
 var tolerance = 2;
 
 /**
+ * [oldMedia description]
+ * @type {[type]}
+ */
+var oldMedia = null;
+
+/**
  * Clase base para representar un proveedor
  */
 class BaseProvider
@@ -96,12 +102,29 @@ class BaseProvider
 	}
 
 	/**
-	 * [Evento] Estamos listos para leer información
+	 * Actualiza la información del Streaming
 	 */
-	ready() {
+	updateMedia() {
+		// Información anterior
+		oldMedia = this.media;
+
+		// Actualizamos
 		this.media.id			= this.getId()
 		this.media.title		= this.getTitle();
 		this.media.duration		= this.getDuration();
+		this.media.url 			= this.getSessionUrl( session.key() );
+
+		// Actualizamos el servidor
+		if ( session != null && Streaming.isOwner ) {
+			session.update({
+				media: provider.media
+			});
+		}
+
+		return delayUntil(function() {
+			// Esperamos hasta que la información cargue
+			return ( oldMedia.id != provider.media.id );
+		}, 1000)();
 	}
 
 	/**

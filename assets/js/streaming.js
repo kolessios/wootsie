@@ -38,9 +38,9 @@ class Streaming
 		// Nombre del cliente
 		this.clientName = '';
 
-		// ¿Autoridad?
-		this.control	= false;
-		this.owner		= false;
+		// Permisos
+		this.hasControl	= false;
+		this.isOwner	= false;
 
 		// Tiempo de sincronización
 		this.sync = -1;
@@ -50,12 +50,35 @@ class Streaming
 	}
 
 	/**
+	 * Devuelve si la página ha cambiado
+	 */
+	static hasChangedPage() {
+		return ( Streaming.url1 != document.location.href && Streaming.url2 != document.location.href );
+	}
+
+	/**
+	 * Devuelve si podemos actualizar el Streaming
+	 */
+	static canTouch() {
+		// Soy la autoridad total
+		if ( this.hasControl == true ) return true;
+
+		// Hay una autoridad local
+		if ( sessionInfo != null && sessionInfo.control != null ) {
+			// No somos nosotros
+			if ( this.hasControl == false ) return false;
+		}
+
+		// Todos podemos :)
+		return true;
+	}
+
+	/**
 	 * Hemos realizado alguna acción
 	 */
 	static touch() {
-		// Hay un "autoridad" y no somos nosotros...
-		// Debemos sincronizarnos con el "autoridad"
-		if ( sessionInfo != null && sessionInfo.control != null && this.control == false ) {
+		// No podemos actualizar el Streaming
+		if ( !this.canTouch() ) {
 			this.sync = -1;
 			return;
 		}
@@ -97,6 +120,7 @@ class Streaming
 	static disconnect() {
 		if ( session == null ) return;
 
+		// Eliminamos los escuchas
 		session.child('viewers').off('child_added');
 		session.child('viewers').off('child_removed');
 		session.off('value');
@@ -120,8 +144,8 @@ class Streaming
 		leader		= null;
 		sessionInfo	= null;
 
-		Streaming.control	= false;
-		Streaming.owner		= false;
+		Streaming.hasControl	= false;
+		Streaming.isOwner		= false;
 		Streaming.sync		= -1;
 
 		console.log('%cDesconexión éxitosa.', 'color:orange');
@@ -138,14 +162,11 @@ class Streaming
 			return;
 		}
 
-		// Dejamos que el proveedor recolecte información
-		// de la propia página
-		provider.ready();
-
 		// Ya tenemos una sesión
 		// nos desconectamos...
 		if ( session != null ) {
 			Streaming.disconnect();
+			return;
 		}
 
 		// Información inicial de la sesión
@@ -155,7 +176,7 @@ class Streaming
 			'created'	: Date.now(),
 			'provider'	: provider.name,
 			
-			'media'		: provider.media,		
+			//'media'		: provider.media,		
 			'viewers'	: {},
 			'chat' 		: {}
 		};
@@ -165,8 +186,8 @@ class Streaming
 		console.log('%cSesión %s creada', 'color:green', session.key());
 
 		// Control total?
-		this.control	= control;
-		this.owner		= true;
+		this.hasControl		= control;
+		this.isOwner		= true;
 
 		// Nos únimos
 		this.join( name, session.key() );
@@ -183,15 +204,16 @@ class Streaming
 			return;
 		}
 
-		// Dejamos que el proveedor recolecte información
-		// de la propia página
-		provider.ready();
-
 		// Nombre del Cliente
 		this.clientName = name;
 
 		// Conexión con la sesión
 		session = server.child( sessionId );
+
+		// Actualizamos la información del Streaming
+		// Los que se únen: Para validar que la sesión es válida
+		// El anfitrion: Subir la info al servidor
+		provider.updateMedia();
 
 		// Obtenemos la información de la sesión
 		session.on('value', function( snapshot ) {
@@ -218,27 +240,10 @@ class Streaming
 				return;
 			}
 
-			// Información
-			sessionInfo = (JSON.parse(JSON.stringify(val)));
+			// Actualizamos la información de la sesión
+			Streaming.updateSession( val );
 
-			// Autoridad total
-			if ( typeof val.viewers != 'undefined' && typeof val.viewers[val.control] != 'undefined' ) {
-				sessionInfo.control		= val.viewers[val.control];
-				sessionInfo.control.id	= val.control;
-			}
-			else {
-				sessionInfo.control = null;
-			}
-
-			// Anfitrión
-			if ( typeof val.viewers != 'undefined' &&  typeof val.viewers[val.owner] != 'undefined' ) {
-				sessionInfo.owner		= val.viewers[val.owner];
-				sessionInfo.owner.id	= val.owner;
-			}
-			else {
-				sessionInfo.owner = null;
-			}
-
+			// Información del cliente
 			let data = {
 				name	: Streaming.clientName,
 				sync	: Streaming.sync,
@@ -260,18 +265,56 @@ class Streaming
 	}
 
 	/**
-	 * Actualiza la información del cliente
+	 * Actualiza localmente la información de la sesión
 	 */
-	static update() {
+	static updateSession( info ) {
+		// Información de la sesión
+		sessionInfo = (JSON.parse(JSON.stringify(info)));
+
+		var viewers = info.viewers;
+
+		// Autoridad total
+		if ( typeof viewers != 'undefined' && typeof viewers[info.control] != 'undefined' ) {
+			sessionInfo.control		= viewers[info.control];
+			sessionInfo.control.id	= info.control;
+		}
+		else {
+			sessionInfo.control = null;
+		}
+
+		// Anfitrión
+		if ( typeof viewers != 'undefined' &&  typeof viewers[info.owner] != 'undefined' ) {
+			sessionInfo.owner		= viewers[info.owner];
+			sessionInfo.owner.id	= info.owner;
+		}
+		else {
+			sessionInfo.owner = null;
+		}
+	}
+
+	/**
+	 * Pensamiento... lo que hacemos cada 300ms
+	 */
+	static think() {
 		// Hemos cambiado de página
-		if ( Streaming.url1 != document.location.href && Streaming.url2 != document.location.href ) {
-			Streaming.disconnect();
+		if ( Streaming.hasChangedPage() ) {
+			Streaming.onChangePage();
 			return;
 		}
 
+		// Enviamos nuestra información
+		Streaming.update();
+	}
+
+	/**
+	 * Actualiza la información del cliente en el servidor
+	 */
+	static update() {
+		if ( session == null || client == null ) return;
+
 		let data = {
-			name	: Streaming.clientName,
-			sync	: Streaming.sync,
+			name	: this.clientName,
+			sync	: this.sync,
 			current	: provider.getCurrent(),
 			state	: provider.getState()
 		};
@@ -279,10 +322,7 @@ class Streaming
 		client.set( data );
 	}
 
-	/**
-	 * [Evento] Conexión establecida
-	 */
-	static onConnected() {
+	static updateUrls() {
 		// Dirección para acceder a la sesión
 		var url = provider.getSessionUrl( session.key() );
 
@@ -292,30 +332,62 @@ class Streaming
 		// Dirección para compartir
 		Streaming.url2 = url;
 
+		// Reemplazamos la dirección actual con la dirección especial
+		window.history.replaceState( null, document.title, url );
+	}
+
+	/**
+	 * [Evento] Hemos cambiado de página
+	 */
+	static onChangePage() {
+		// No somos el anfitrion, nos desconectamos de la sesión
+		if ( !Streaming.isOwner ) {
+			Streaming.disconnect();
+		}
+
+		// Somos el anfitrion, actualizamos la sesión
+		// y que los invitados actualizen
+		else {
+			// Actualizamos la información del Stream
+			provider.updateMedia().then(function() {
+				// Actualizamos las direcciones
+				Streaming.updateUrls();
+
+				// Inyectamos el chat
+				Chat.init();
+			});
+		}
+	}
+
+	/**
+	 * [Evento] Conexión establecida
+	 */
+	static onConnected() {
+		// Actualizamos las direcciones
+		Streaming.updateUrls();
+
 		// Dueño de la sesión
-		if ( this.owner ) {
+		if ( this.isOwner ) {
 			session.update({ owner: client.key() });
 			Streaming.touch();
 		}
 
 		// Tenemos el control absoluto
-		if ( this.control )
+		if ( this.hasControl ) {
 			session.update({ control: client.key() });
+		}
 
 		// Avisamos al proveedor
 		provider.onConnected();
 
-		// Empezamos a mandar nuestras actualizacaiones
-		Streaming.update();
-		Streaming.updateInterval = setInterval( Streaming.update, 300 );
+		// Empezamos a pensar!
+		Streaming.think();
+		Streaming.updateInterval = setInterval( Streaming.think, 300 );
 
 		// Binds
 		session.child('viewers').on('child_added', Streaming.onClientConnect);
 		session.child('viewers').on('child_removed', Streaming.onClientDisconnect);
 		session.on('value', Streaming.onUpdate);
-
-		// Reemplazamos la dirección actual con la dirección especial
-		window.history.replaceState( null, document.title, url );
 
 		// Respondemos a Wootsie con la información de la sesión
 		this.sendMessage({
@@ -324,7 +396,7 @@ class Streaming
 			'url'		: url
 		});
 
-		// Iniciamos el chat
+		// Inyectamos el chat
 		Chat.init();
 
 		console.timeEnd('Preparado');
@@ -365,30 +437,18 @@ class Streaming
 	static onUpdate( snapshot ) {
 		var val = snapshot.val();
 
+		// El anfitrion ha cambiado de página
+		if ( val.media.id != provider.media.id ) {
+			console.warn('[Wootsie] El anfitrión ha cambiado de %s a %s', provider.media.id, val.media.id);
+			return;
+		}
+
 		// Información de nuestro streaming
 		var current = Math.floor( provider.getCurrent() );
 		var state 	= provider.getState();
 
 		// Actualizamos la información de la sesión
-		sessionInfo = (JSON.parse(JSON.stringify(val)));
-
-		// Autoridad total
-		if ( typeof val.viewers[val.control] != 'undefined' ) {
-			sessionInfo.control		= val.viewers[val.control];
-			sessionInfo.control.id	= val.control;
-		}
-		else {
-			sessionInfo.control = null;
-		}
-
-		// Anfitrión
-		if ( typeof val.viewers[val.owner] != 'undefined' ) {
-			sessionInfo.owner		= val.viewers[val.owner];
-			sessionInfo.owner.id	= val.owner;
-		}
-		else {
-			sessionInfo.owner = null;
-		}
+		Streaming.updateSession( val );
 
 		// Líder de reproducción
 		var lead		= null;
@@ -421,7 +481,7 @@ class Streaming
 		// Nuestro líder actual
 		leader = lead;
 
-		// Actualizamos la información del chat
+		// Actualizamos la información del chat (líder y anfitrión)
 		Chat.update();
 
 		// Ya estamos sincronizados

@@ -229,13 +229,23 @@ class Chat
 		// No tenemos chat
 		if ( reference == null || chat == null ) return;
 
+		// Líder
 		if ( leader != null ) {
 			chat.find('.top-info .leader .name').html( leader.name );
 			chat.find('.top-info .leader .time').html( Math.round(leader.current) );
 		}
+		else {
+			chat.find('.top-info .leader .name').html( 'Desconocido' );
+			chat.find('.top-info .leader .time').html( '0' );
+		}
 
-		if ( sessionInfo.owner != null )
+		// Anfitrion
+		if ( sessionInfo.owner != null ) {
 			chat.find('.top-info .owner .name').html( sessionInfo.owner.name );
+		}
+		else {
+			chat.find('.top-info .owner .name').html( 'Desconectado' );
+		}
 	}
 
 	/**

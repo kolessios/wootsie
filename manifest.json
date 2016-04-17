@@ -1,8 +1,8 @@
 {
 	"manifest_version": 2,
 	"name": "Wootsie",
-	"version": "0.1",
-	"version_name": "beta 1",
+	"version": "0.3",
+	"version_name": "beta 1.3",
 	"description": "Ve sincronizadamente tus series y películas favoritas de Netflix, ClaroVideo, Blim y Youtube.",
 	"author": "Ivan Bravo Bravo",
 	"homepage_url": "http://sie.woots.mx/",
