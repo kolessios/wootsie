@@ -132,7 +132,7 @@ class Streaming
 	 */
 	static create( name, control = false ) {
 		// Aún no ha cargado por completo
-		if ( provider.getId() == undefined || provider.getState() == 'loading' ) {
+		if ( provider.getId() == undefined || provider.getId().length == 0 || provider.getState() == 'loading' ) {
 			console.count('Reintentando...');
 			delay(500)().then(function() { Streaming.create( name, control ); });
 			return;
@@ -177,7 +177,7 @@ class Streaming
 	 */
 	static join( name, sessionId ) {
 		// Aún no ha cargado por completo
-		if ( provider.getId() == undefined || provider.getState() == 'loading' ) {
+		if ( provider.getId() == undefined || provider.getId().length == 0 || provider.getState() == 'loading' ) {
 			console.count('Reintentando...');
 			delay(500)().then(function() { Streaming.join( name, sessionId ); });
 			return;
@@ -263,6 +263,12 @@ class Streaming
 	 * Actualiza la información del cliente
 	 */
 	static update() {
+		// Hemos cambiado de página
+		if ( Streaming.url1 != document.location.href && Streaming.url2 != document.location.href ) {
+			Streaming.disconnect();
+			return;
+		}
+
 		let data = {
 			name	: Streaming.clientName,
 			sync	: Streaming.sync,
@@ -277,6 +283,15 @@ class Streaming
 	 * [Evento] Conexión establecida
 	 */
 	static onConnected() {
+		// Dirección para acceder a la sesión
+		var url = provider.getSessionUrl( session.key() );
+
+		// Dirección original
+		Streaming.url1 = document.location.href;
+
+		// Dirección para compartir
+		Streaming.url2 = url;
+
 		// Dueño de la sesión
 		if ( this.owner ) {
 			session.update({ owner: client.key() });
@@ -298,9 +313,6 @@ class Streaming
 		session.child('viewers').on('child_added', Streaming.onClientConnect);
 		session.child('viewers').on('child_removed', Streaming.onClientDisconnect);
 		session.on('value', Streaming.onUpdate);
-
-		// Dirección para acceder a la sesión
-		var url = provider.getSessionUrl( session.key() );
 
 		// Reemplazamos la dirección actual con la dirección especial
 		window.history.replaceState( null, document.title, url );

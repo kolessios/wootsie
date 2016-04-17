@@ -16,7 +16,8 @@ class YouTube extends BaseProvider
 	 * Devuelve la ID del Stream
 	 */
 	getId() {
-		return $.query.get('v');
+		var query = $.query.load( document.location.href );
+		return query.get('v');
 	}
 
 	/**

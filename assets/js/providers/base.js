@@ -284,7 +284,8 @@ class BaseProvider
 	 * Devuelve la lista de parámetros para la dirección para compartir
 	 */
 	getFixedQuery( sessionId ) {
-		return $.query.set('wootsie', sessionId);
+		var query = $.query.load( document.location.href );
+		return query.set('wootsie', sessionId);
 	}
 
 	/**
