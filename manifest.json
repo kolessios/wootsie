@@ -54,6 +54,7 @@
       			"assets/js/libs/firebase.js",
       			"assets/js/libs/jquery-2.2.3.min.js", 
       			"assets/js/libs/jquery.query-object.js",
+      			"assets/js/libs/moment.min.js",
       			
       			"assets/js/streaming.js",
       			"assets/js/chat.js"

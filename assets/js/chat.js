@@ -35,7 +35,7 @@ class Chat
 		reference.on('child_added', this.onReceiveMessage)
 
 		// Presionando una tecla en el cuadro de mensaje
-		$('#chat-message').on('keydown', this.prepareMessage);
+		$('#chat-message').on('keydown', this.sendMessage);
 
 		// Queremos cerrar el chat
 		$('#close-chat').on('click', this.close);
@@ -45,7 +45,7 @@ class Chat
 		$(window).on('resize', this.resize);
 
 		// Algunos proveedores tienen el click bloqueado...
-		$('#chat-message').on('click', function() { $('#chat-message').focus(); });
+		$('#chat-message').on('click', function() { $(this).focus(); });
 
 		console.log('¡Preparado!');
 		console.groupEnd();
@@ -67,6 +67,8 @@ class Chat
 
 		player.removeClass('chat-open').removeClass('chat-closed');
 		chat.remove();
+
+		chat = null;
 
 		$('body').removeClass( provider.name.toLowerCase() );
 	}
@@ -118,7 +120,10 @@ class Chat
 	 * [Evento] Estamos presionando una tecla en el cuadro
 	 * para escribir un mensaje
 	 */
-	static prepareMessage( e ) {
+	static sendMessage( e ) {
+		// Evitamos que el reproductor se afecte...
+		e.stopPropagation();
+
 		// Solo "ENTER"
 		if ( e.keyCode != 13 ) return;
 		e.preventDefault();
@@ -163,7 +168,7 @@ class Chat
 		// Mensaje de usuario
 		else {
 			div.append('<strong class="name">' + data.clientName + ':</strong>');
-			div.append('<p>' + htmlEntities(data.message) + '</p>');
+			div.append('<p>' + htmlEntities(data.message).trim() + '</p>');
 
 			// Mi mensaje
 			if ( data.clientId == client.key() )
@@ -231,8 +236,10 @@ class Chat
 
 		// Líder
 		if ( leader != null ) {
+			var time = moment().startOf('day').seconds( leader.current ).format('mm:ss');
+
 			chat.find('.top-info .leader .name').html( leader.name );
-			chat.find('.top-info .leader .time').html( Math.round(leader.current) );
+			chat.find('.top-info .leader .time').html( time );
 		}
 		else {
 			chat.find('.top-info .leader .name').html( 'Desconocido' );
@@ -270,6 +277,13 @@ class Chat
 	 * Inyecta el código HTML del chat en la página del Streaming
 	 */
 	static inject() {
+		// Ya fue inyectado
+		if ( chat != null ) {
+			console.error('El chat ya esta inyectado.');
+			console.groupEnd();
+			return;
+		}
+
 		// Reproductor
 		var player = provider.injectChatAfterThis();
 

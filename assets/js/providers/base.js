@@ -106,7 +106,9 @@ class BaseProvider
 	 */
 	updateMedia() {
 		// Información anterior
-		oldMedia = this.media;
+		if ( !this.isPageLoading() ) {
+			oldMedia = this.media;
+		}
 
 		// Actualizamos
 		this.media.id			= this.getId()
@@ -114,17 +116,26 @@ class BaseProvider
 		this.media.duration		= this.getDuration();
 		this.media.url 			= this.getSessionUrl( session.key() );
 
-		// Actualizamos el servidor
-		if ( session != null && Streaming.isOwner ) {
-			session.update({
-				media: provider.media
-			});
-		}
-
 		return delayUntil(function() {
 			// Esperamos hasta que la información cargue
-			return ( oldMedia.id != provider.media.id );
-		}, 1000)();
+			return ( !provider.isPageLoading() /*&& oldMedia.id != provider.media.id*/ );
+		}, 3000, true)()
+		.then(function() {
+			// Somos el anfitrion y la información esta preparada
+			// la actualizamos en el servidor
+			if ( session != null && Streaming.isOwner ) {
+				session.update({
+					media: provider.media
+				});
+			}
+		});
+	}
+
+	/**
+	 * Devuelve si la página sigue cargando
+	 */
+	isPageLoading() {
+		return ( isNaN(this.getDuration()) || this.getId() == null || this.getId() == undefined || this.getTitle() == null || this.getTitle() == undefined );
 	}
 
 	/**
@@ -256,7 +267,7 @@ class BaseProvider
 
 		return delayUntil(function() {
 			return ( Math.floor(ms) - Math.floor(provider.getCurrent()) <= tolerance );
-		}, 10000)();
+		}, 5000)();
 	}
 
 	/**
@@ -375,40 +386,47 @@ function addProviders() {
  * https://css-tricks.com/snippets/javascript/htmlentities-for-javascript/
  */
 function htmlEntities(str) {
-    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+	return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
 /**
  * https://github.com/boyers/netflixparty-chrome/blob/master/content_script.js#L44
  */
-var delay = function(milliseconds) {
-  return function(result) {
-	return new Promise(function(resolve, reject) {
-	  setTimeout(function() {
-		resolve(result);
-	  }, milliseconds);
-	});
-  };
+var delay = function( milliseconds ) {
+	return function( result ) {
+		return new Promise(function(resolve, reject) {
+			setTimeout(function() {
+				resolve(result);
+			}, milliseconds);
+		});
+	};
 };
 
 /**
  * https://github.com/boyers/netflixparty-chrome/blob/master/content_script.js#L56
  */
-var delayUntil = function(condition, maxDelay) {
-  return function(result) {
-    var delayStep = 250;
-    var startTime = (new Date()).getTime();
-    var checkForCondition = function() {
-      if (condition()) {
-        return Promise.resolve(result);
-      }
-      if (maxDelay !== null && (new Date()).getTime() - startTime > maxDelay) {
-      	console.error('delayUntil timed out');
-      	 return Promise.resolve(result);
-        //return Promise.reject(Error('delayUntil timed out'));
-      }
-      return delay(delayStep)().then(checkForCondition);
-    };
-    return checkForCondition();
-  };
+ var delayUntil = function( condition, maxDelay, reject ) {
+ 	return function(result) {
+ 		var delayStep = 250;
+ 		var startTime = (new Date()).getTime();
+ 		var checkForCondition = function() {
+ 			if ( condition() ) {
+ 				return Promise.resolve(result);
+ 			}
+
+ 			if ( maxDelay !== null && (new Date()).getTime() - startTime > maxDelay ) {
+ 				if ( reject === true ) {
+ 					return Promise.reject(Error('delayUntil timed out - reject'));
+ 				}
+ 				else {
+ 					console.warn('delayUntil timed out');
+ 					return Promise.resolve(result);
+ 				}
+			}
+
+			return delay( delayStep )().then( checkForCondition );
+		};
+
+		return checkForCondition();
+	};
 };

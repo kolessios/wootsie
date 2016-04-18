@@ -24,6 +24,12 @@ var client = null;
 var leader = null;
 
 /**
+ * ¿Estamos esperando la carga de otro Streaming?
+ * @type {Boolean}
+ */
+var waitingChange = false;
+
+/**
  * Controla la sincronización, las acciones con el Stream y la comunicación entre el proveedor y el Popup (Wootsie)
  */
 class Streaming
@@ -47,6 +53,13 @@ class Streaming
 
 		// Preparamos...
 		this.prepare();
+	}
+
+	/**
+	 * Devuelve si soy el líder
+	 */
+	static imLeader() {
+		return ( leader.id == client.key() );
 	}
 
 	/**
@@ -156,7 +169,7 @@ class Streaming
 	 */
 	static create( name, control = false ) {
 		// Aún no ha cargado por completo
-		if ( provider.getId() == undefined || provider.getId().length == 0 || provider.getState() == 'loading' ) {
+		if ( provider.isPageLoading() ) {
 			console.count('Reintentando...');
 			delay(500)().then(function() { Streaming.create( name, control ); });
 			return;
@@ -176,9 +189,9 @@ class Streaming
 			'created'	: Date.now(),
 			'provider'	: provider.name,
 			
-			//'media'		: provider.media,		
-			'viewers'	: {},
-			'chat' 		: {}
+			//'media'	: {},	
+			//'viewers'	: {},
+			//'chat' 	: {}
 		};
 
 		// Creamos la sesión en el servidor
@@ -198,7 +211,7 @@ class Streaming
 	 */
 	static join( name, sessionId ) {
 		// Aún no ha cargado por completo
-		if ( provider.getId() == undefined || provider.getId().length == 0 || provider.getState() == 'loading' ) {
+		if ( provider.isPageLoading() ) {
 			console.count('Reintentando...');
 			delay(500)().then(function() { Streaming.join( name, sessionId ); });
 			return;
@@ -231,7 +244,7 @@ class Streaming
 			}
 
 			// Esta sesión no es para esta transmisión
-			if ( val.media.id != provider.media.id || val.provider != provider.name ) {
+			if ( typeof val.media != 'undefined' && (val.media.id != provider.media.id || val.provider != provider.name) ) {
 				// Respondemos a Wootsie
 				Streaming.sendMessage({ 'command': 'invalid-streaming' });
 				delay(500)().then( Streaming.disconnect );
@@ -322,6 +335,9 @@ class Streaming
 		client.set( data );
 	}
 
+	/**
+	 * Actualiza las direcciones para la transmisión
+	 */
 	static updateUrls() {
 		// Dirección para acceder a la sesión
 		var url = provider.getSessionUrl( session.key() );
@@ -340,16 +356,33 @@ class Streaming
 	 * [Evento] Hemos cambiado de página
 	 */
 	static onChangePage() {
-		// No somos el anfitrion, nos desconectamos de la sesión
+		var update = false;
+
+		// No somos el anfitrion
 		if ( !Streaming.isOwner ) {
-			Streaming.disconnect();
+			// Estamos esperando a obtener la información del Stream
+			if ( waitingChange ) {
+				update = true;
+			}
+			// Nos desconectamos de la sesión
+			else {
+				Streaming.disconnect();
+			}
 		}
 
-		// Somos el anfitrion, actualizamos la sesión
-		// y que los invitados actualizen
+		// Somos el anfitrion
 		else {
-			// Actualizamos la información del Stream
+			update = true;
+			//console.warn('[Wootsie] Hemos actualizado la página!');
+		}
+
+		// Debemos actualizar la información del streaming, las direcciones
+		// y volver a inyectar el chat
+		if ( update ) {
+			// Actualizamos y esperamos a que cargue
 			provider.updateMedia().then(function() {
+				waitingChange = false;
+
 				// Actualizamos las direcciones
 				Streaming.updateUrls();
 
@@ -382,7 +415,7 @@ class Streaming
 
 		// Empezamos a pensar!
 		Streaming.think();
-		Streaming.updateInterval = setInterval( Streaming.think, 300 );
+		Streaming.updateInterval = setInterval( Streaming.think, 1000 );
 
 		// Binds
 		session.child('viewers').on('child_added', Streaming.onClientConnect);
@@ -393,7 +426,7 @@ class Streaming
 		this.sendMessage({
 			'command'	: 'connected',
 			'sessionId'	: session.key(), 
-			'url'		: url
+			'url'		: provider.getSessionUrl( session.key() )
 		});
 
 		// Inyectamos el chat
@@ -438,7 +471,13 @@ class Streaming
 		var val = snapshot.val();
 
 		// El anfitrion ha cambiado de página
-		if ( val.media.id != provider.media.id ) {
+		if ( val.media.id != provider.media.id && !Streaming.isOwner ) {
+			// Seguimos esperando...
+			if ( waitingChange ) return;
+
+			document.location.href = val.media.url;
+			waitingChange = true;
+
 			console.warn('[Wootsie] El anfitrión ha cambiado de %s a %s', provider.media.id, val.media.id);
 			return;
 		}
@@ -473,7 +512,7 @@ class Streaming
 
 			// ¡La autoridad se ha desconectado!
 			if ( lead == null ) {
-				//Streaming.disconnect();
+				Streaming.disconnect();
 				return;
 			}
 		}
@@ -483,6 +522,8 @@ class Streaming
 
 		// Actualizamos la información del chat (líder y anfitrión)
 		Chat.update();
+
+		if ( leader == null ) return;
 
 		// Ya estamos sincronizados
 		if ( leader.sync == (Streaming.sync+1) ) return;
@@ -601,13 +642,6 @@ class Streaming
 	 */
 	static sendMessage( message, response = null ) {
 		chrome.runtime.sendMessage( message, response );
-	}
-
-	/**
-	 * Devuelve si soy el líder
-	 */
-	static imLeader() {
-		return ( leader.id == client.key() );
 	}
 }
 
