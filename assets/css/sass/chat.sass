@@ -19,6 +19,8 @@ $own-color		: #cccccc
 		width: calc( 100% - 20px ) !important
 
 body
+	border-top: 3px solid #212121
+
 	&.netflix, &.clarovideo, &.blim
 		overflow: hidden
 
@@ -34,7 +36,7 @@ body
 	bottom: 0
 	width: $chat-width
 	font-size: 12px
-	transition: all .3s ease-in-out
+	transition: all .4s ease-in-out
 
 	&.closed
 		background: #212121
@@ -62,19 +64,26 @@ body
 
 		.leader, .owner
 			flex: 1
+			text-align: center
 
 			.title
 				color: white
 				display: block
 				margin-bottom: 10px
 				font-weight: bold
-				font-size: 1.2em
+				font-size: 1em
 
 			span
 				color: white
+				font-size: 0.9em
+
+	&.new-message
+		.messages-container
+			border-left-color: $system-color
 
 	.messages-container
 		border-top: 2px solid #262626
+		border-left: 3px solid transparent
 		overflow: auto
 
 		.single
@@ -82,7 +91,7 @@ body
 			padding: 8px 15px
 			border-top: 1px solid #262626
 			border-bottom: 1px solid black
-			border-left: 2px solid $system-color
+			line-height: 1.3em
 
 			&:first-child
 				border-top: 0
@@ -91,10 +100,10 @@ body
 				opacity: 0.9 !important
 
 			&.fade
-				opacity: 0.4
+				opacity: 0.6
 
 			&.active
-				border-left-color: transparent
+				//border-left-color: transparent
 				transition: .4s all ease-in-out
 
 			&.system
@@ -108,13 +117,18 @@ body
 				p
 					color: $own-color !important
 
+				.name
+					color: #67c1f5
+
 			.name
 				display: block
-				margin-bottom: 1px
 				color: white
+				font-size: 1.3em
 
-				p
-					color: white
+			p
+				color: white
+				font-size: 1.2em
+				margin-top: 2px
 
 	.message-box
 		textarea

@@ -24,6 +24,21 @@ class Popup
 	}
 
 	/**
+	 * Traduce el código HTML al idioma del usuario
+	 */
+	static translate() {
+		$('translate').each(function() {
+			var text = $(this).text().trim();
+			$(this).html( tl(text) );
+		});
+
+		$('[data-placeholder]').each(function() {
+			var text = $(this).data('placeholder');
+			$(this).attr('placeholder', tl(text));
+		});
+	}
+
+	/**
 	 * Prepara todo con la información de la pestaña activa
 	 */
 	static prepare( tab ) {
@@ -41,6 +56,9 @@ class Popup
 
 		// Mostramos el logo del proveedor
 		provider.setLogo();
+
+		// Traducimos
+		this.translate();
 
 		// Binds!
 		this.binds();

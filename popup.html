@@ -30,82 +30,82 @@
 	<div class="mode-selector">
 		<div style="display: flex">
 			<div data-show=".create-box" class="create-session-button">
-				<h1>Crear sesión</h1>
+				<h1><translate>popup_create_sesion</translate></h1>
 			</div>
 
 			<div data-show=".join-box" class="join-session-button">
-				<h1>Únirse a sesión</h1>
+				<h1><translate>popup_join_session</translate></h1>
 			</div>
 		</div>
 	</div>
 
 	<!-- Información de la sesión -->
 	<div class="session-details box">
-		<h3>Detalles de la sesión</h3>
+		<h3><translate>popup_details</translate></h3>
 
 		<div class="form-group">
-			<strong>ID de la sesión:</strong><br />
+			<strong><translate>popup_session_id</translate>:</strong><br />
 			<input data-value="session_id" />
 		</div>
 
 		<div class="form-group">
-			<strong>Dirección:</strong><br />
+			<strong><translate>popup_address</translate>:</strong><br />
 			<input data-value="session_url" id="session_url" />
 		</div>
 
 		<p class="helper-text">
-			Tus amigos pueden acceder usando la <strong>ID de la sesión</strong> o accediendo directamente con la <strong>dirección</strong> en Google Chrome (siempre y cuando tengan Wootsie instalado)
+			<translate>popup_create_explain</translate>
 		</p>
 
 		<div class="form-group btns">
-			<button type="button" id="disconnect">Desconectar</button>
+			<button type="button" id="disconnect"><translate>popup_disconnect</translate></button>
 		</div>
 	</div>
 
 	<!-- Crear sesión -->
 	<div class="create-box box">
-		<h3>Creación de sesión</h3>
+		<h3><translate>popup_create_title</translate></h3>
 
 		<div class="form-group">
-			<input id="name" placeholder="Tu nombre" />
+			<input id="name" data-placeholder="your_name" />
 		</div>
 
 		<div class="form-group">
-			<input type="checkbox" id="control" value="1" /> <label for="control">Autoridad total</label>
-			<span class="helper-text">Solo tú podrás reproducir, pausar y controlar la reproducción.</span>
+			<input type="checkbox" id="control" value="1" /> <label for="control"><translate>popup_total_control</translate></label>
+			<span class="helper-text"><translate>popup_control_explain</translate></span>
 		</div>
 
 		<div class="form-group btns">
-			<button type="button" data-back>< Volver</button>
-			<button type="button" id="create-session">¡Comenzar!</button>
+			<button type="button" data-back>< <translate>back</translate></button>
+			<button type="button" id="create-session"><translate>start</translate></button>
 		</div>
 
-		<span class="helper-text">Al comenzar se te asignara una ID y una dirección especial para compartir con tus amigos y familiares.</span>
+		<span class="helper-text"><translate>popup_created_explain</translate></span>
 	</div>
 
 	<!-- Unirse a sesión -->
 	<div class="join-box box">
-		<h3>Unirse a una sesión</h3>
+		<h3><translate>popup_join_title</translate></h3>
 
 		<span class="error-msg"></span>
 
 		<div class="form-group">
-			<input id="join-name" placeholder="Tu nombre" />
+			<input id="join-name" data-placeholder="your_name" />
 		</div>
 
 		<div class="form-group">
-			<input id="id" placeholder="ID de la Sesión" />
+			<input id="id" data-placeholder="popup_session_id" />
 		</div>
 
 		<div class="form-group btns">
-			<button type="button" data-back>< Volver</button>
-			<button type="button" id="join-session">Unirse</button>
+			<button type="button" data-back>< <translate>back</translate></button>
+			<button type="button" id="join-session"><translate>join</translate></button>
 		</div>
 	</div>
 
 	<!-- Cargando -->
 	<div class="loading">
-		<h2>Cargando...</h2>
+		<h2><translate>loading</translate></h2>
 	</div>
 
 	<div class="footer">

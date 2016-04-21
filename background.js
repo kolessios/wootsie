@@ -58,11 +58,11 @@ class Background
 			// Mostramos el icono, estamos preparados
 			if ( tab.status == 'complete' ) {
 				chrome.pageAction.show( tabId );
-				chrome.pageAction.setTitle( { tabId: tabId, title: "¡Iniciar!" } );
+				chrome.pageAction.setTitle( { tabId: tabId, title: tl('start2') } );
 			}
 			else {
 				chrome.pageAction.hide( tabId );
-				chrome.pageAction.setTitle( { tabId: tabId, title: "Cargando..." } );
+				chrome.pageAction.setTitle( { tabId: tabId, title: tl('loading') } );
 			}
 		}
 
@@ -70,14 +70,14 @@ class Background
 		else if ( Background.isValidProvider(tab.url) ) {
 			// Ocultamos el icono
 			chrome.pageAction.hide( tabId );
-			chrome.pageAction.setTitle( { tabId: tabId, title: "Inicia alguna serie/película." } );
+			chrome.pageAction.setTitle( { tabId: tabId, title: tl('start_streaming') } );
 		}
 
 		// No estamos en una página válida
 		else {
 			// Ocultamos el icono
 			chrome.pageAction.hide( tabId );
-			chrome.pageAction.setTitle( { tabId: tabId, title: "No se puede usar Wootsie aquí." } );
+			chrome.pageAction.setTitle( { tabId: tabId, title: tl('invalid_page') } );
 		}
 	}
 }

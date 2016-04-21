@@ -1,0 +1,150 @@
+{
+	"app_description": {
+		"message": "Mira al mismo tiempo con tus amigos series y películas de Netflix, ClaroVideo, Blim, Youtube y Vimeo.",
+		"description": "Descripción de la extensión"
+	},
+
+	"app_reload": {
+		"message": "Refresca la página para comenzar",
+		"description": "Indica al usuario que refresque la página para preparar la extensión"
+	},
+
+	"popup_create_sesion": {
+		"message": "Crear sesión",
+		"description": "Botón para crear una sesión"
+	},
+
+	"popup_join_session": {
+		"message": "Únirse a sesión",
+		"description": "Botón para únirse a una sesión"
+	},
+
+	"popup_details": {
+		"message": "Detalles de la sesión",
+		"description": "Título de los detalles de la sesión"
+	},
+
+	"popup_session_id": {
+		"message": "ID de la sesión",
+		"description": ""
+	},
+
+	"popup_address": {
+		"message": "Dirección",
+		"description": "Dirección para compartir"
+	},
+
+	"popup_create_explain": {
+		"message": "Tus amigos pueden acceder usando la <strong>ID de la sesión</strong> o accediendo directamente con la <strong>dirección</strong> en Google Chrome (siempre y cuando tengan Wootsie instalado)",
+		"description": "Explicación de la creación de una sesión sobre como compartir la ID y la dirección especial"
+	},
+
+	"popup_disconnect": {
+		"message": "Desconectar"
+	},
+
+	"popup_create_title": {
+		"message": "Creación de sesión"
+	},
+
+	"popup_join_title": {
+		"message": "Unirse a una sesión"
+	},
+
+	"popup_total_control": {
+		"message": "Autoridad total"
+	},
+
+	"popup_control_explain": {
+		"message": "Solo tú podrás reproducir, pausar y controlar la reproducción.",
+		"description": "Explicación de la Autoridad Total"
+	},
+
+	"popup_created_explain": {
+		"message": "Al comenzar se te asignara una ID y una dirección especial para compartir con tus amigos y familiares."
+	},
+
+	"chat_hide": {
+		"message": "Ocultar chat"
+	},
+
+	"chat_leader": {
+		"message": "Líder"
+	},
+
+	"chat_owner": {
+		"message": "Anfitrión"
+	},
+
+	"chat_write": {
+		"message": "Escribe tu mensaje"
+	},
+
+	"chat_paused": {
+		"message": "pausado"
+	},
+
+	"chat_playing": {
+		"message": "reanudado"
+	},
+
+	"chat_system_state": {
+		"message": "<strong>$name$</strong> ha $status$ la reproducción",
+		"placeholders": {
+			"name": {
+				"content": "$1"
+			},
+			"status": {
+				"content": "$2"
+			}
+		}
+	},
+
+	"chat_system_seek": {
+		"message": "<strong>$name$</strong> ha cambiado el tiempo a $time$",
+		"placeholders": {
+			"name": {
+				"content": "$1"
+			},
+			"time": {
+				"content": "$2"
+			}
+		}
+	},
+
+	"back": {
+		"message": "Volver"
+	},
+
+	"start": {
+		"message": "¡Comenzar!"
+	},
+
+	"start2": {
+		"message": "Iniciar"
+	},
+
+	"start_streaming": {
+		"message": "Inicia alguna serie/película."
+	},
+
+	"invalid_page": {
+		"message": "No se puede usar Wootsie aquí."
+	},
+
+	"your_name": {
+		"message": "Tu nombre"
+	},
+
+	"join": {
+		"message": "Unirse"
+	},
+
+	"loading": {
+		"message": "Cargando..."
+	},
+
+	"unknown": {
+		"message": "Desconocido"
+	}
+}

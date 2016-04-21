@@ -18,6 +18,11 @@ var tolerance = 2;
  * @type {[type]}
  */
 var oldMedia = null;
+	
+/**
+ * Acceso corto
+ */
+var tl = chrome.i18n.getMessage;
 
 /**
  * Clase base para representar un proveedor

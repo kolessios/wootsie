@@ -185,7 +185,7 @@ class Chat
 		container.scrollTop( 9999 );
 
 		// Esta oculto, avisamos...
-		if ( Chat.isClosed() && !chat.hasClass('new-message') ) {
+		if ( /*Chat.isClosed() &&*/ !chat.hasClass('new-message') ) {
 			chat.addClass('new-message');
 			delay(800)().then(function() { chat.removeClass('new-message'); });
 		}
@@ -193,7 +193,7 @@ class Chat
 		// Baja prioridad...
 		setTimeout(function() {
 			div.addClass('fade');
-		}, 5000);
+		}, 10000);
 	}
 
 	/**
@@ -203,14 +203,14 @@ class Chat
 		// No tenemos chat
 		if ( reference == null || chat == null ) return;
 
-		var statusName = 'pausado';
+		var statusName = 'chat_paused';
 
 		if ( status === 'playing' )
-			statusName = 'reanudado';
+			statusName = 'chat_playing';
 
 		Chat.addMessage({
 			system: true,
-			message: '<strong>'+name+'</strong> ha '+statusName+' la reproducción.'
+			message: tl('chat_system_state', [name, tl(statusName)])
 		});	
 	}
 
@@ -221,9 +221,11 @@ class Chat
 		// No tenemos chat
 		if ( reference == null || chat == null ) return;
 
+		var timeFormatted = moment().startOf('day').seconds( time ).format('mm:ss');
+
 		Chat.addMessage({
 			system: true,
-			message: '<strong>'+name+'</strong> ha cambiado el tiempo a ' + time
+			message: tl('chat_system_seek', [name, timeFormatted])
 		});	
 	}
 
@@ -242,7 +244,7 @@ class Chat
 			chat.find('.top-info .leader .time').html( time );
 		}
 		else {
-			chat.find('.top-info .leader .name').html( 'Desconocido' );
+			chat.find('.top-info .leader .name').html( tl('unknown') );
 			chat.find('.top-info .leader .time').html( '0' );
 		}
 
@@ -251,7 +253,7 @@ class Chat
 			chat.find('.top-info .owner .name').html( sessionInfo.owner.name );
 		}
 		else {
-			chat.find('.top-info .owner .name').html( 'Desconectado' );
+			chat.find('.top-info .owner .name').html( tl('unknown') );
 		}
 	}
 
@@ -296,15 +298,15 @@ class Chat
 
 		// Código del CHAT
 		var html = `<div class="wootsie-chat" id="wootsie-chat">
-		<a href="#" id="close-chat" title="Ocultar chat">−</a>
+		<a href="#" id="close-chat" title="` + tl('chat_hide') + `">−</a>
 		<div class="top-info">
 			<div class="leader">
-				<strong class="title">Líder:</strong>
+				<strong class="title">` + tl('chat_leader') + `:</strong>
 				<span class="name"></span> - <span class="time"></span>
 			</div>
 
 			<div class="owner">
-				<strong class="title">Anfitrión:</strong>
+				<strong class="title">` + tl('chat_owner') + `:</strong>
 				<span class="name"></span>
 			</div>
 		</div>
@@ -314,7 +316,7 @@ class Chat
 		</div>
 
 		<div class="message-box">
-			<textarea id="chat-message" placeholder="Escribe tu mensaje..."></textarea>
+			<textarea id="chat-message" placeholder="` + tl('chat_write') + `"></textarea>
 		</div>
 	</div>`;
 
