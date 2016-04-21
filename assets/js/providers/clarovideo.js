@@ -66,6 +66,11 @@ class ClaroVideo extends BaseProvider
 		$('body').on('click', 'vph5-play-pause-button .fa-pause', this.onPaused);
 		$('body').on('click', 'vph5-play-pause-button .fa-play', this.onPlay);
 		$('vph5-scrub-bar').on('click', this.onSeek);
+
+		$('body').on('keydown', function(e) {
+			e.stopImmediatePropagation();
+			e.stopPropagation();
+		});
 	}
 
 	/**
@@ -75,6 +80,8 @@ class ClaroVideo extends BaseProvider
 		$('body').off('click', 'vph5-play-pause-button .fa-pause');
 		$('body').off('click', 'vph5-play-pause-button .fa-play');
 		$('vph5-scrub-bar').off('click');
+
+		$('body').off('keydown');
 	}
 
 	/**

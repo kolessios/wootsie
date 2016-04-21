@@ -1,0 +1,150 @@
+{
+	"app_description": {
+		"message": "Olhe ao mesmo tempo com a sua série de amigos e filmes do Netflix, ClaroVideo, Blim, Youtube e Vimeo.",
+		"description": "Descripción de la extensión"
+	},
+
+	"app_reload": {
+		"message": "Atualize a página para começar",
+		"description": "Indica al usuario que refresque la página para preparar la extensión"
+	},
+
+	"popup_create_sesion": {
+		"message": "Criar uma sessão",
+		"description": "Botón para crear una sesión"
+	},
+
+	"popup_join_session": {
+		"message": "Junte-se a Sessão",
+		"description": "Botón para únirse a una sesión"
+	},
+
+	"popup_details": {
+		"message": "Details Session",
+		"description": "Título de los detalles de la sesión"
+	},
+
+	"popup_session_id": {
+		"message": "Identificação de sessão",
+		"description": ""
+	},
+
+	"popup_address": {
+		"message": "Endereço",
+		"description": "Dirección para compartir"
+	},
+
+	"popup_create_explain": {
+		"message": "-",
+		"description": "Explicación de la creación de una sesión sobre como compartir la ID y la dirección especial"
+	},
+
+	"popup_disconnect": {
+		"message": "Desconexão"
+	},
+
+	"popup_create_title": {
+		"message": "Criando sessão"
+	},
+
+	"popup_join_title": {
+		"message": "Juntando uma sessão"
+	},
+
+	"popup_total_control": {
+		"message": "Plena autoridade"
+	},
+
+	"popup_control_explain": {
+		"message": "Somente você pode reproduzir, pausar e controlar a reprodução.",
+		"description": "Explicación de la Autoridad Total"
+	},
+
+	"popup_created_explain": {
+		"message": "-."
+	},
+
+	"chat_hide": {
+		"message": "Ocultar bate-papo"
+	},
+
+	"chat_leader": {
+		"message": "Líder"
+	},
+
+	"chat_owner": {
+		"message": "Hospedeiro"
+	},
+
+	"chat_write": {
+		"message": "Escreva a sua mensagem!"
+	},
+
+	"chat_paused": {
+		"message": "vagaroso"
+	},
+
+	"chat_playing": {
+		"message": "retomaram"
+	},
+
+	"chat_system_state": {
+		"message": "<strong>$name$</strong> ha $status$ a reprodução",
+		"placeholders": {
+			"name": {
+				"content": "$1"
+			},
+			"status": {
+				"content": "$2"
+			}
+		}
+	},
+
+	"chat_system_seek": {
+		"message": "<strong>$name$</strong> ele foi alterado ao longo do tempo $time$",
+		"placeholders": {
+			"name": {
+				"content": "$1"
+			},
+			"time": {
+				"content": "$2"
+			}
+		}
+	},
+
+	"back": {
+		"message": "Regressar"
+	},
+
+	"start": {
+		"message": "Iniciado!"
+	},
+
+	"start2": {
+		"message": "Começo"
+	},
+
+	"start_streaming": {
+		"message": "Começa uma série / filme."
+	},
+
+	"invalid_page": {
+		"message": "Você não pode usar Wootsie aqui."
+	},
+
+	"your_name": {
+		"message": "Teu nome"
+	},
+
+	"join": {
+		"message": "Juntar"
+	},
+
+	"loading": {
+		"message": "Carregamento..."
+	},
+
+	"unknown": {
+		"message": "Desconhecido"
+	}
+}

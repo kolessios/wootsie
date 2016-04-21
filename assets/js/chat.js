@@ -36,6 +36,8 @@ class Chat
 
 		// Presionando una tecla en el cuadro de mensaje
 		$('#chat-message').on('keydown', this.sendMessage);
+		$('#chat-message').on('keyup', function(e) { e.stopPropagation(); });
+		$('#chat-message').on('keypress', function(e) { e.stopPropagation(); });
 
 		// Queremos cerrar el chat
 		$('#close-chat').on('click', this.close);
@@ -63,6 +65,8 @@ class Chat
 		reference = null;
 
 		$('#chat-message').off('keydown');
+		$('#chat-message').off('keyup');
+		$('#chat-message').off('keypress');
 		$('#close-chat').off('click');
 
 		player.removeClass('chat-open').removeClass('chat-closed');

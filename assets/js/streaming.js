@@ -471,7 +471,7 @@ class Streaming
 		var val = snapshot.val();
 
 		// El anfitrion ha cambiado de página
-		if ( val.media.id != provider.media.id && !Streaming.isOwner ) {
+		if ( !Streaming.isOwner && val.media.id != provider.media.id ) {
 			// Seguimos esperando...
 			if ( waitingChange ) return;
 

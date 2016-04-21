@@ -26,7 +26,10 @@ class Netflix extends BaseProvider
 	 * Devuelve la ID del Stream
 	 */
 	getId() {
-		return $('.episode-list-item.episode-list-item--expanded').data('episode-id');
+		var s1 = document.location.href.split('/');
+		var s2 = s1[4].split('?');
+
+		return s2[0];
 	}
 
 	/**
