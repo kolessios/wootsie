@@ -9,7 +9,7 @@ $own-color		: #cccccc
 /**
  * Netflix
  */
-#netflix-player, .vph5-player.main-wrapper, blim-player-html5
+#netflix-player, .vph5-player.main-wrapper, blim-player-html5, #mubi-player
 	transition: .3s width ease-in-out
 
 	&.chat-open
@@ -21,7 +21,7 @@ $own-color		: #cccccc
 body
 	border-top: 3px solid #212121
 
-	&.netflix, &.clarovideo, &.blim
+	&.netflix, &.clarovideo, &.blim, &.mubi
 		overflow: hidden
 
 /**
@@ -37,6 +37,7 @@ body
 	width: $chat-width
 	font-size: 12px
 	transition: all .4s ease-in-out
+	font-family: Arial, sans-serif
 
 	&.closed
 		background: #212121
@@ -112,6 +113,7 @@ body
 				text-align: center
 				border-top-color: #1ac0dd
 				border-bottom-color: #138599
+				color: white
 
 			&.own
 				p
@@ -128,7 +130,7 @@ body
 			p
 				color: white
 				font-size: 1.2em
-				margin-top: 2px
+				margin-top: 5px
 
 	.message-box
 		textarea

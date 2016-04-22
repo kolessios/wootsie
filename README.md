@@ -1,6 +1,6 @@
 # Wootsie
 
-Wootsie es una extensión para Google Chrome que te permite ver series y películas de [Netflix](https://www.netflix.com/), [ClaroVideo](https://www.clarovideo.com) y [Blim](http://www.blim.com/) de forma sincronizada. También soporta de forma experimental vídeos de [YouTube](https://www.youtube.com/) y [Vimeo](https://vimeo.com/). Solo basta con crear una sesión e invitar a todos los que quieras a ella mediante la ID de la sesión o la dirección especial para compartir, una vez que todos estén dentro si alguién pausa, reanuda o cambia el tiempo de reproducción, todos se verán afectados para que vean lo mismo.
+Wootsie es una extensión para Google Chrome que te permite ver series y películas de [Netflix](https://www.netflix.com/), [ClaroVideo](https://www.clarovideo.com), [Blim](http://www.blim.com/), [Mubi](https://mubi.com) de forma sincronizada. También soporta de forma experimental vídeos de [YouTube](https://www.youtube.com/) y [Vimeo](https://vimeo.com/). Solo basta con crear una sesión e invitar a todos los que quieras a ella mediante la ID de la sesión o la dirección especial para compartir, una vez que todos estén dentro si alguién pausa, reanuda o cambia el tiempo de reproducción, todos se verán afectados para que vean lo mismo.
 
 ## Versión BETA
 

@@ -72,7 +72,7 @@ class BaseProvider
 	 * Devuelve el título del Stream
 	 */
 	getTitle() {
-		return 'Invalid';
+		return $('title').text().trim();
 	}
 
 	/**
@@ -361,7 +361,6 @@ class BaseProvider
  * Devuelve el proveedor para la dirección web
  */
 function getProvider( url ) {
-	console.log(url);
 	// Buscamos entre todos los proveedores
 	for( let i in providers ) {
 		let provider = providers[i];
@@ -382,6 +381,7 @@ function addProviders() {
 	providers['netflix']	= new Netflix();
 	providers['clarovideo']	= new ClaroVideo();
 	providers['blim']		= new Blim();
+	providers['mubi'] 		= new Mubi();
 	providers['youtube']	= new YouTube();
 	providers['vimeo']		= new Vimeo(); // TODO: Pruebas
 }
@@ -434,4 +434,12 @@ var delay = function( milliseconds ) {
 
 		return checkForCondition();
 	};
+};
+
+/**
+ * http://stackoverflow.com/questions/1144783/replacing-all-occurrences-of-a-string-in-javascript
+ */
+String.prototype.replaceAll = function(search, replacement) {
+    var target = this;
+    return target.split(search).join(replacement);
 };

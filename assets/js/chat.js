@@ -152,6 +152,17 @@ class Chat
 		$('#chat-message').prop('disabled', false).val('');
 	}
 
+	static cl( message ) {
+		message = message.replaceAll('<333', '❣');
+		message = message.replaceAll('<33', '♡');
+		message = message.replaceAll('<3', '♥');
+		message = message.replaceAll(':)', 'ツ');
+		message = htmlEntities( message );
+		message = message.trim();
+
+		return message;
+	}
+
 	/**
 	 * Agrega un mensaje en el chat con la información
 	 */
@@ -172,7 +183,7 @@ class Chat
 		// Mensaje de usuario
 		else {
 			div.append('<strong class="name">' + data.clientName + ':</strong>');
-			div.append('<p>' + htmlEntities(data.message).trim() + '</p>');
+			div.append('<p>' + Chat.cl(data.message) + '</p>');
 
 			// Mi mensaje
 			if ( data.clientId == client.key() )
