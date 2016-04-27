@@ -11,7 +11,7 @@ class Popup
 		addProviders();
 
 		// Obtenemos la pestaña activa
-		chrome.tabs.query({active: true}, function( tabs ) {
+		chrome.tabs.query({ active: true, currentWindow: true }, function( tabs ) {
 			// Preparamos
 			for ( let i in tabs ) {
 				Popup.prepare( tabs[i] );
@@ -38,17 +38,18 @@ class Popup
 	 * Prepara todo con la información de la pestaña activa
 	 */
 	static prepare( tab ) {
-		// Pestaña
-		this.tab = tab;
-
 		// Obtenemos el proveedor de la página
 		provider = getProvider( tab.url );
 
 		// ¡No es un proveedor válido!
 		if ( provider == null ) {
-			console.error('[Wootsie] Se ha permitido abrir el Popup sin una pestaña válida!');
+			console.error('[Wootsie] Se ha permitido abrir el Popup sin una pestaña válida! ' + tab.url);
 			return;
 		}
+
+		// Pestaña
+		this.tab = tab;
+		console.log('[Wootsie] ' + provider.name + ' - ' + tab.url);
 
 		// Mostramos el logo del proveedor
 		provider.setLogo();
