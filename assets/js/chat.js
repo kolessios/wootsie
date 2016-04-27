@@ -3,11 +3,43 @@
  */
 var reference = null;
 
-
 /**
  * Contenedor del chat
  */
 var chat = null;
+
+/**
+ * Texto a Iconos
+ * @type {Object}
+ */
+var icons = {
+	'<3333'	: '💗',
+	'<333'	: '💖',
+	'<33'	: '💕',
+	'<3'	: '❤',
+	':))'	: 'ヅ',
+	':)'	: 'ツ',
+	':('	: '☹',
+	':P'	: '😛',
+	';P'	: '😜',
+	'-.-'	: '😒',
+	':s'	: '😕',
+	':S'	: '😕',
+	':O'	: '😲',
+	':o'	: '😲',
+	'(y)'	: '👍'
+};
+
+/**
+ * Corazones
+ * @type {Object}
+ */
+var hearts = [
+	'💗',
+	'💖',
+	'💕',
+	'❤'
+];
 
 /**
  * Controla todo lo relacionado con el chat
@@ -153,12 +185,27 @@ class Chat
 	}
 
 	static cl( message ) {
-		message = message.replaceAll('<333', '❣');
-		message = message.replaceAll('<33', '♡');
-		message = message.replaceAll('<3', '♥');
-		message = message.replaceAll(':)', 'ツ');
+		for( let i in icons ) {
+			message = message.replaceAll(i, icons[i]);
+		}
+
 		message = htmlEntities( message );
 		message = message.trim();
+
+		// Solo es un caracter
+		if ( message.length <= 2 ) {
+			for( let i in icons ) {
+				// Es un icono! Lo mostramos grande
+				if ( message == icons[i] ) {
+					message = '<span class="big">' + icons[i] + '</span>';
+					break;
+				}
+			}
+		}
+
+		for( let i in hearts ) {
+			message = message.replaceAll(hearts[i], '<span class="heart">' + hearts[i] + '</span>');
+		}
 
 		return message;
 	}
@@ -182,8 +229,10 @@ class Chat
 
 		// Mensaje de usuario
 		else {
+			let gmessage = Chat.cl(data.message);
+
 			div.append('<strong class="name">' + data.clientName + ':</strong>');
-			div.append('<p>' + Chat.cl(data.message) + '</p>');
+			div.append('<p>' + gmessage + '</p>');
 
 			// Mi mensaje
 			if ( data.clientId == client.key() )
@@ -199,13 +248,13 @@ class Chat
 		// Scroll
 		container.scrollTop( 9999 );
 
-		// Esta oculto, avisamos...
-		if ( /*Chat.isClosed() &&*/ !chat.hasClass('new-message') ) {
+		// Avisamos por 1s
+		if ( !chat.hasClass('new-message') ) {
 			chat.addClass('new-message');
-			delay(800)().then(function() { chat.removeClass('new-message'); });
+			delay(1000)().then(function() { chat.removeClass('new-message'); });
 		}
 
-		// Baja prioridad...
+		// Baja prioridad... 10s
 		setTimeout(function() {
 			div.addClass('fade');
 		}, 10000);

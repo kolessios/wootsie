@@ -218,7 +218,7 @@ class Streaming
 		}
 
 		// Nombre del Cliente
-		this.clientName = name;
+		this.clientName = htmlEntities( name.substr(0, 35) );
 
 		// Conexión con la sesión
 		session = server.child( sessionId );

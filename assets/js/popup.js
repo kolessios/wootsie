@@ -11,15 +11,11 @@ class Popup
 		addProviders();
 
 		// Obtenemos la pestaña activa
-		chrome.tabs.query({active: true}, function( tab ) {
-			if ( typeof tab[0] == undefined ) {
-				console.error('> Se ha permitido abrir el Popup sin una pestaña válida!');
-				return;
-			}
-
+		chrome.tabs.query({active: true}, function( tabs ) {
 			// Preparamos
-			tab = tab[0];
-			Popup.prepare( tab );
+			for ( let i in tabs ) {
+				Popup.prepare( tabs[i] );
+			}
 		});
 	}
 

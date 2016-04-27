@@ -6,6 +6,25 @@ $chat-width		: 300px
 $system-color	: #00A9CA
 $own-color		: #cccccc
 
+@keyframes heartbeat
+	0%
+		transform: scale( .75 )
+	
+	20%
+		transform: scale( 1 )
+
+	40%
+		transform: scale( .75 )	
+
+	60%
+		transform: scale( 1 )	
+
+	80%
+		transform: scale( .75 )
+
+	100% 
+		transform: scale( .75 )
+
 /**
  * Netflix
  */
@@ -84,15 +103,15 @@ body
 
 	.messages-container
 		border-top: 2px solid #262626
-		border-left: 3px solid transparent
-		overflow: auto
+		border-left: 4px solid transparent
+		overflow-x: hidden
+		overflow-y: auto
 
 		.single
 			display: none
 			padding: 8px 15px
 			border-top: 1px solid #262626
 			border-bottom: 1px solid black
-			line-height: 1.3em
 
 			&:first-child
 				border-top: 0
@@ -103,8 +122,11 @@ body
 			&.fade
 				opacity: 0.6
 
+				.heart
+					-webkit-animation: none !important
+					animation: none !important
+
 			&.active
-				//border-left-color: transparent
 				transition: .4s all ease-in-out
 
 			&.system
@@ -125,12 +147,29 @@ body
 			.name
 				display: block
 				color: white
-				font-size: 1.3em
+				font-size: 1em
 
 			p
 				color: white
 				font-size: 1.2em
-				margin-top: 5px
+				margin-top: 2px
+				overflow: hidden
+				white-space: normal
+				text-overflow: clip
+				line-height: 1.5em
+				margin-bottom: 0
+
+				.big
+					display: inline-block
+					font-size: 2.5em
+					line-height: 1em
+					margin: 10px 0
+
+				.heart
+					display: inline-block
+					color: red !important
+					-webkit-animation: heartbeat 1.5s infinite
+					animation: heartbeat 1.5s infinite
 
 	.message-box
 		textarea
