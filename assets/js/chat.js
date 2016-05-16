@@ -246,7 +246,7 @@ class Chat
 		div.fadeIn('slow', function() { div.addClass('active'); });
 
 		// Scroll
-		container.scrollTop( 9999 );
+		container.scrollTop( 99999999999 );
 
 		// Avisamos por 1s
 		if ( !chat.hasClass('new-message') ) {

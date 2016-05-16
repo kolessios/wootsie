@@ -16,13 +16,6 @@ class Netflix extends BaseProvider
 	}
 
 	/**
-	 * Instancia al <video> del Stream
-	 */
-	video() {
-		return $('.player-video-wrapper video').get(0);
-	}
-
-	/**
 	 * Devuelve la ID del Stream
 	 */
 	getId() {
@@ -39,14 +32,14 @@ class Netflix extends BaseProvider
 		// Contenedor con la información
 		var container = $('.playback-longpause-container .content');
 
-		if ( container.length == 0 ) return null;
+		if ( container.length == 0 ) return super.getTitle();
 
 		// Titulos
 		var media		= container.find('h2').text();
 		var subtitle	= container.find('h3').first().text();
 		var chapter		= container.find('h3').last().text();
 
-		if ( media.length == 0 ) return null;
+		if ( media.length == 0 ) return super.getTitle();
 
 		var title = media;
 

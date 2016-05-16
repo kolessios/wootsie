@@ -11,7 +11,7 @@ var provider = null;
 /**
  * Tolerancia para el tiempo de reproducción
  */
-var tolerance = 2;
+var tolerance = 1;
 
 /**
  * [oldMedia description]
@@ -115,17 +115,17 @@ class BaseProvider
 			oldMedia = this.media;
 		}
 
-		// Actualizamos
-		this.media.id			= this.getId()
-		this.media.title		= this.getTitle();
-		this.media.duration		= this.getDuration();
-		this.media.url 			= this.getSessionUrl( session.key() );
-
 		return delayUntil(function() {
 			// Esperamos hasta que la información cargue
 			return ( !provider.isPageLoading() /*&& oldMedia.id != provider.media.id*/ );
 		}, 3000, true)()
 		.then(function() {
+			// Actualizamos
+			provider.media.id			= provider.getId()
+			provider.media.title		= provider.getTitle();
+			provider.media.duration		= provider.getDuration();
+			provider.media.url 			= provider.getSessionUrl( session.key() );
+		
 			// Somos el anfitrion y la información esta preparada
 			// la actualizamos en el servidor
 			if ( session != null && Streaming.isOwner ) {
